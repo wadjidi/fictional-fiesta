@@ -1,0 +1,2351 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Form Survei Genangan — v1.2 (index.html)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; background: #1e293b; display: flex; justify-content: center; min-height: 100vh; }
+  .phone { width: 100%; max-width: 480px; background: #f1f5f9; padding-bottom: 2px; }
+
+  /* HEADER */
+  .hdr { background: linear-gradient(135deg, #0284c7, #0ea5e9, #06b6d4); color: #fff; padding: 26px 20px 22px; }
+  .brand { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #e0f2fe; margin-bottom: 4px; }
+  .hdr h1 { font-size: 23px; font-weight: 800; line-height: 1.15; }
+  .hdr p { font-size: 12px; color: #e0f2fe; margin-top: 4px; }
+  .prog { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+  .prog i { flex: 1; height: 6px; border-radius: 99px; background: rgba(255,255,255,.3); transition: background .4s; }
+  .prog i.on { background: #fff; }
+  .prog b { font-size: 12px; }
+
+  /* KARTU */
+  .main { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .card { position: relative; background: #fff; border: 2px solid #e2e8f0; border-radius: 18px; padding: 18px 16px; box-shadow: 0 1px 2px rgba(15,23,42,.05); transition: border-color .3s, box-shadow .3s; }
+  .card.done { border-color: #6ee7b7; box-shadow: 0 4px 14px rgba(16,185,129,.12); }
+  .badge { display: none; position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 99px; background: #10b981; color: #fff; font-size: 15px; font-weight: 900; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(16,185,129,.4); }
+  .card.done .badge { display: flex; }
+  .row { display: flex; gap: 12px; align-items: flex-start; }
+  .num { width: 32px; height: 32px; border-radius: 10px; background: #e0f2fe; color: #0369a1; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card.done .num { background: #d1fae5; color: #047857; }
+  .content { flex: 1; min-width: 0; }
+  .content h3 { font-size: 15px; color: #1e293b; margin-bottom: 12px; }
+  .sec-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; margin: 16px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .sec-label.first { margin-top: 0; }
+
+  /* WAKTU */
+  .tap-box { width: 100%; border: 2px dashed #7dd3fc; background: rgba(240,249,255,.7); border-radius: 16px; padding: 24px 12px; text-align: center; color: #0369a1; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform .1s; }
+  .tap-box:active { transform: scale(.98); }
+  .tap-box small { display: block; font-weight: 500; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+  .tap-box .ico { font-size: 26px; display: block; margin-bottom: 8px; }
+  .waktu-panel { background: linear-gradient(135deg, #f0f9ff, #ecfeff); border-radius: 16px; padding: 16px; text-align: center; }
+  .waktu-panel .hari { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #0ea5e9; text-transform: uppercase; }
+  .waktu-panel .tanggal { font-size: 17px; font-weight: 800; color: #1e293b; margin-top: 2px; }
+  .waktu-panel .jam { font-size: 34px; font-weight: 800; color: #0284c7; font-variant-numeric: tabular-nums; margin-top: 4px; letter-spacing: -1px; }
+  .waktu-panel small { font-size: 11px; color: #94a3b8; }
+  .btn-mini { margin-top: 10px; background: #fff; color: #0284c7; border: 1px solid #bae6fd; border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .btn-mini:active { transform: scale(.95); }
+
+  /* CUACA */
+  .cuaca-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .cuaca { border: 2px solid #e2e8f0; background: #f8fafc; border-radius: 16px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all .15s; }
+  .cuaca .ic { width: 48px; height: 48px; opacity: .5; filter: saturate(.35); transition: all .15s; }
+  .cuaca span { font-size: 11px; font-weight: 700; color: #64748b; text-align: center; line-height: 1.2; }
+  .cuaca .chk { display: none; font-size: 13px; color: #d97706; font-weight: 900; }
+  .cuaca.on { border-color: #fbbf24; background: linear-gradient(180deg, #fffbeb, #fef3c7); transform: translateY(-2px) scale(1.05); box-shadow: 0 8px 16px rgba(251,191,36,.35); }
+  .cuaca.on .ic { opacity: 1; filter: none; transform: scale(1.18); }
+  .cuaca.on span { color: #b45309; }
+  .cuaca.on .chk { display: block; }
+  .cuaca-note { display: none; margin-top: 10px; background: #fffbeb; color: #b45309; border-radius: 12px; padding: 8px 12px; font-size: 12px; font-weight: 700; }
+  .cuaca-note.on { display: block; }
+
+  /* KOORDINAT */
+  .gps-hasil { background: linear-gradient(135deg, #f0f9ff, #ecfeff); border-radius: 16px; padding: 14px; }
+  .gps-hasil .koor { font-size: 19px; font-weight: 800; color: #0369a1; font-variant-numeric: tabular-nums; }
+  .gps-hasil .meta { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+  .gps-hasil .meta a { color: #0284c7; font-weight: 700; text-decoration: underline; cursor: pointer; }
+  .gps-cari { display: flex; align-items: center; justify-content: center; gap: 8px; background: #f0f9ff; border-radius: 16px; padding: 20px; color: #0284c7; font-weight: 700; font-size: 14px; }
+  .gps-err { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; border-radius: 12px; padding: 8px 12px; font-size: 11px; font-weight: 700; line-height: 1.5; }
+  .dot { width: 10px; height: 10px; border-radius: 99px; background: #0ea5e9; animation: ping 1s infinite; }
+  @keyframes ping { 0% { opacity: 1; } 50% { opacity: .25; } 100% { opacity: 1; } }
+  .sec-label .gps-ic { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* LOKASI SAYA — panel alamat otomatis dari koordinat 3.1 (reverse geocoding OSM) */
+  .lokasi-tap { padding: 14px 12px; font-size: 13px; }
+  .lokasi-tap .gps-ic { width: 20px; height: 20px; display: block; margin: 0 auto 6px; }
+  .lokasi-tap small { display: block; font-weight: 500; font-size: 10.5px; color: #94a3b8; margin-top: 3px; }
+  .lokasi-hasil { background: linear-gradient(135deg, #fef2f2, #fff); border: 1.5px solid #fecaca; border-radius: 16px; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; margin-top: 10px; }
+  .lokasi-hasil .gps-ic { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+  .lokasi-hasil .teks { font-size: 12.5px; font-weight: 700; color: #7f1d1d; line-height: 1.55; }
+  .lokasi-hasil .meta { margin-top: 4px; }
+  .lokasi-hasil .meta a { color: #dc2626; font-weight: 700; font-size: 10.5px; text-decoration: underline; cursor: pointer; }
+  .lokasi-err { margin-top: 10px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; border-radius: 12px; padding: 8px 12px; font-size: 11px; font-weight: 700; line-height: 1.5; }
+
+  /* 3.2 Opsi Manual / Otomatis */
+  .opsi { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .opsi button { border: none; border-radius: 12px; padding: 10px; font-size: 12px; font-weight: 800; background: #f1f5f9; color: #64748b; cursor: pointer; transition: all .15s; }
+  .opsi button.on { background: #0284c7; color: #fff; box-shadow: 0 6px 14px rgba(2,132,199,.3); }
+  .lbl { display: block; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+  .inp { width: 100%; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 12px; padding: 10px 12px; font-size: 15px; color: #1e293b; outline: none; transition: border .15s; }
+  .inp:focus { border-color: #38bdf8; background: #fff; }
+
+  /* KEDALAMAN */
+  .depth-list { display: flex; flex-direction: column; gap: 8px; }
+  .depth-item { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 14px; padding: 10px; }
+  .depth-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .depth-title { font-size: 12px; font-weight: 800; color: #475569; }
+  .depth-tools { display: flex; gap: 6px; }
+  .tool { width: 32px; height: 32px; border: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .1s, background .15s; }
+  .tool:active { transform: scale(.88); }
+  .tool-edit { background: #fef3c7; color: #b45309; }
+  .tool-edit.idle-cursor { background: #e0f2fe; color: #7dd3fc; cursor: default; }
+  .tool-hapus { background: #ffe4e6; color: #e11d48; }
+  .tool-hapus:hover { background: #fecdd3; }
+  .tool svg { width: 16px; height: 16px; }
+  .depth-val { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 10px 12px; font-size: 15px; font-weight: 800; color: #0369a1; font-variant-numeric: tabular-nums; }
+  .depth-val .muted { color: #cbd5e1; font-weight: 600; font-size: 12px; }
+  .tambah { width: 100%; border: 2px dashed #7dd3fc; background: rgba(240,249,255,.6); color: #0284c7; border-radius: 12px; padding: 10px; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform .1s; }
+  .tambah:active { transform: scale(.98); }
+
+  /* PANEL OTOMATIS */
+  .otomatis-box { border: 2px dashed #7dd3fc; background: rgba(240,249,255,.6); border-radius: 16px; padding: 20px; text-align: center; }
+  .otomatis-box .gear { font-size: 30px; }
+  .otomatis-box b { display: block; margin-top: 6px; color: #0369a1; font-size: 14px; }
+  .otomatis-box p { font-size: 11px; color: #94a3b8; margin-top: 4px; line-height: 1.5; }
+
+  /* OPSI MODE OTOMATIS: 1. TRACKING, 2. TITIK KOORDINAT, 3. AI */
+  .opsi-otom { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 14px; text-align: left; }
+  /* Pilihan bentuk mode Manual: 2–6 polyline (persegi panjang s.d. segi enam) */
+  .bentuk-sel { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+  .kartu-opsi { position: relative; border: 2px solid #e2e8f0; background: #fff; border-radius: 14px; padding: 14px 10px 12px; cursor: pointer; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .kartu-opsi:hover { border-color: #7dd3fc; }
+  .kartu-opsi .no { position: absolute; top: 8px; left: 10px; font-size: 11px; font-weight: 800; color: #94a3b8; }
+  .kartu-opsi svg { width: 30px; height: 30px; color: #0284c7; opacity: .55; transition: all .15s; }
+  .kartu-opsi .nama { font-size: 10.5px; font-weight: 800; color: #475569; line-height: 1.25; text-align: center; }
+  .kartu-opsi .cek { position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; border-radius: 50%; background: #10b981; color: #fff; font-size: 12px; font-weight: 900; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(16,185,129,.4); }
+  .kartu-opsi.on { border-color: #0284c7; background: #f0f9ff; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(2,132,199,.15); }
+  .kartu-opsi.on svg { opacity: 1; transform: scale(1.12); }
+  .kartu-opsi.on .nama { color: #0369a1; }
+  .kartu-opsi.on .cek { display: flex; }
+  .opsi-otom-note { margin-top: 12px; font-size: 11px; color: #94a3b8; line-height: 1.5; text-align: center; }
+  .opsi-otom-terpilih { margin-top: 10px; font-size: 12px; font-weight: 800; color: #0369a1; text-align: center; }
+
+  /* TRACKING (alur logika 1) — luas dari jejak keliling batas genangan */
+  .trk-box { border: 1px solid #e2e8f0; background: #fff; border-radius: 16px; padding: 14px; margin-top: 12px; }
+  .trk-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .trk-head b { font-size: 12px; color: #0369a1; }
+  .trk-status { font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 99px; background: #f1f5f9; color: #64748b; white-space: nowrap; }
+  .trk-status.wait { background: #fef3c7; color: #b45309; }
+  .trk-status.on { background: #d1fae5; color: #059669; }
+  .trk-status.bad { background: #fee2e2; color: #dc2626; }
+  .trk-status.sim { background: #e0e7ff; color: #4338ca; }
+  .trk-map { margin-top: 10px; border-radius: 12px; overflow: hidden; aspect-ratio: 11/8; background-color: #f0f9ff; background-image: linear-gradient(rgba(2,132,199,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(2,132,199,.06) 1px,transparent 1px); background-size: 26px 26px; box-shadow: inset 0 0 0 1px #e0f2fe; }
+  .trk-map svg { width: 100%; height: 100%; display: block; }
+  .trk-empty { font-size: 11px; color: #94a3b8; text-align: center; padding: 12px 10px; line-height: 1.5; }
+  .trk-btn { border: none; border-radius: 12px; padding: 10px 8px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all .15s; }
+  .trk-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .trk-go { background: #0284c7; color: #fff; }
+  .trk-go.rec { background: #10b981; }
+  .trk-vtx { width: 100%; background: #f59e0b; color: #fff; margin-top: 8px; position: relative; overflow: hidden; }
+  .trk-vtx i { position: absolute; inset: 0 auto 0 0; width: calc(var(--p,0)*100%); background: rgba(0,0,0,.18); }
+  .trk-vtx span { position: relative; }
+  .trk-row { display: grid; grid-template-columns: 1fr 46px 46px; gap: 8px; margin-top: 8px; }
+  .trk-ic { background: #f1f5f9; color: #475569; font-size: 15px; padding: 0; }
+  .trk-ic.del { color: #e11d48; }
+  .trk-auto { width: 100%; margin-top: 8px; background: #f1f5f9; color: #64748b; }
+  .trk-auto.on { background: #0284c7; color: #fff; }
+  .trk-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .trk-opt { border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 12px; padding: 10px; font-size: 11px; color: #475569; line-height: 1.5; }
+  .trk-opt b { display: block; font-size: 11.5px; color: #334155; margin-bottom: 4px; }
+  .trk-opt input[type=range] { width: 100%; accent-color: #0284c7; height: 24px; margin: 6px 0 2px; }
+  .trk-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 10px; text-align: center; }
+  .trk-stats .k { font-size: 8.5px; font-weight: 800; letter-spacing: .5px; color: #94a3b8; text-transform: uppercase; }
+  .trk-stats .v { font-size: 15px; font-weight: 900; color: #0f172a; font-variant-numeric: tabular-nums; }
+  .trk-stats .u { font-size: 8.5px; color: #94a3b8; }
+  .trk-listhead { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 8px; margin-top: 12px; font-size: 11px; font-weight: 800; color: #475569; }
+  .trk-chip { border: none; background: #e0f2fe; color: #0369a1; font-size: 10.5px; font-weight: 800; padding: 6px 10px; border-radius: 99px; cursor: pointer; }
+  .trk-chip:disabled { opacity: .4; cursor: not-allowed; }
+  .trk-rowitem { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; padding: 6px 2px; border-top: 1px solid #f1f5f9; }
+  .trk-rowitem .co { font-family: ui-monospace, Menlo, monospace; color: #334155; }
+  .trk-rowitem .q { color: #059669; font-weight: 700; white-space: nowrap; }
+  .trk-note { margin-top: 8px; font-size: 10px; color: #94a3b8; line-height: 1.5; }
+  .trk-pulse { transform-box: fill-box; transform-origin: center; animation: trkpl 1.8s ease-out infinite; }
+  @keyframes trkpl { from { transform: scale(.6); opacity: .7; } to { transform: scale(1.9); opacity: 0; } }
+
+  /* TITIK KOORDINAT (alur logika 2) — luas dari pojok batas genangan */
+  .tkk-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .tkk-seg button { border: 1px solid #e2e8f0; background: #f1f5f9; color: #64748b; border-radius: 12px; padding: 10px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all .15s; }
+  .tkk-seg button.on { background: #0284c7; border-color: transparent; color: #fff; box-shadow: 0 6px 14px rgba(2,132,199,.3); }
+  .tkk-rowgrid { display: grid; grid-template-columns: 26px 1fr 1fr 34px; gap: 6px; align-items: center; margin-top: 6px; }
+  .tkk-no { width: 24px; height: 24px; border-radius: 50%; background: #0369a1; color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center; }
+  .tkk-inp { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 8px; font-size: 12px; text-align: center; font-family: ui-monospace, Menlo, monospace; outline: none; width: 100%; box-sizing: border-box; background: #fff; }
+  .tkk-inp:focus { border-color: #0284c7; background: #f0f9ff; }
+  .tkk-del { border: none; background: #ffe4e6; color: #e11d48; border-radius: 9px; height: 30px; cursor: pointer; font-size: 13px; }
+  .tkk-warn { display: none; margin-top: 8px; background: #fef2f2; color: #b91c1c; border-radius: 10px; padding: 8px 10px; font-size: 10.5px; font-weight: 700; line-height: 1.5; }
+  .tkk-warn.show { display: block; }
+  .tkk-eks { display: flex; gap: 6px; }
+
+  /* AI (alur logika 3) — luas dari analisis foto genangan */
+  .ai-btns { display: grid; grid-template-columns: 1fr 1fr 46px; gap: 8px; margin-top: 10px; }
+  .ai-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; margin-top: 10px; }
+  .ai-thumb { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background: #0f172a; }
+  .ai-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ai-thumb .num { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,.75); color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 800; }
+  .ai-thumb .del { position: absolute; top: 3px; right: 3px; border: none; background: rgba(239,68,68,.9); color: #fff; width: 18px; height: 18px; border-radius: 5px; font-size: 10px; cursor: pointer; line-height: 1; padding: 0; }
+  .ai-set { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .ai-set select { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 8px; font-size: 11.5px; font-weight: 700; color: #334155; background: #fff; }
+  .ai-warn { margin-top: 8px; background: #fffbeb; border: 1px solid #fbbf24; color: #b45309; border-radius: 10px; padding: 8px 10px; font-size: 10.5px; line-height: 1.5; }
+  .ai-log { margin-top: 8px; background: #0f172a; border-radius: 10px; padding: 8px; font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: #94a3b8; max-height: 130px; overflow-y: auto; white-space: pre-wrap; }
+  .ai-res { display: none; margin-top: 12px; text-align: center; border-radius: 12px; background: #f0f9ff; border: 1px solid #e0f2fe; padding: 14px; }
+  .ai-res.show { display: block; }
+  .ai-res .lbl { font-size: 9.5px; font-weight: 800; letter-spacing: 1px; color: #64748b; text-transform: uppercase; }
+  .ai-res .big { font-size: 34px; font-weight: 900; color: #0f172a; line-height: 1.1; }
+  .ai-res .big small { font-size: 14px; color: #64748b; font-weight: 700; }
+  .ai-res .unc { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .ai-pill { display: inline-block; padding: 4px 12px; border-radius: 99px; font-size: 10.5px; font-weight: 800; margin-top: 8px; }
+  .ai-pill.LAYAK { background: #d1fae5; color: #059669; }
+  .ai-pill.PERLU { background: #fef3c7; color: #b45309; }
+  .ai-pill.GAGAL { background: #fee2e2; color: #dc2626; }
+  .ai-gates { margin-top: 8px; text-align: left; font-size: 10.5px; }
+  .ai-gates .g { display: flex; justify-content: space-between; padding: 4px 2px; border-top: 1px solid #e0f2fe; }
+  .ai-gates .g:first-child { border-top: none; }
+  .ai-gates .gv.ok { color: #059669; font-weight: 800; }
+  .ai-gates .gv.warn { color: #b45309; font-weight: 800; }
+  .ai-gates .gv.bad { color: #dc2626; font-weight: 800; }
+
+  /* HASIL (latar soft, angka menonjol) */
+  .hasil { margin-top: 14px; background: linear-gradient(135deg, #f8fcff, #effbff); border: 1px solid #cdeafd; border-radius: 16px; padding: 14px; }
+  .hasil-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+  .hasil-grid.satu { grid-template-columns: 1fr; }
+  .hasil-grid .k { font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; }
+  .hasil-grid .v { font-size: 18px; font-weight: 900; color: #0f172a; font-variant-numeric: tabular-nums; }
+  .hasil-grid .u { font-size: 9px; color: #94a3b8; }
+  .hasil small { display: block; text-align: center; margin-top: 8px; font-size: 9px; color: #94a3b8; }
+  .hasil small.tersembunyi { display: none; }
+  /* angka berkedip saat pensil / tong sampah diklik, lalu berhenti & memudar */
+  .hasil.blink .v { animation: blinkNum .6s linear infinite; }
+  @keyframes blinkNum { 0%, 100% { color: #b45309; opacity: 1; } 50% { color: #f59e0b; opacity: .25; } }
+  .hasil.fade .v { animation: fadeNum .9s ease 1; }
+  @keyframes fadeNum { 0% { color: #b45309; opacity: .2; } 100% { color: #0f172a; opacity: 1; } }
+
+  /* PILLS */
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 4px; border-radius: 99px; padding: 3px 10px; font-size: 11px; font-weight: 700; background: #f1f5f9; color: #94a3b8; }
+  .pill.on { background: #d1fae5; color: #047857; }
+
+  /* FOTO — slot lebih lega, rasio 4:3, pratinjau gambar + stempel metadata */
+  .foto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .slot { position: relative; aspect-ratio: 4/3; border: 2px dashed #cbd5e1; background: #f8fafc; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: all .15s; padding: 8px; overflow: hidden; }
+  .slot svg { width: 26px; height: 26px; color: #cbd5e1; }
+  .slot span { font-size: 11px; font-weight: 700; color: #94a3b8; text-align: center; line-height: 1.25; }
+  .slot.sudah { border: 2px solid #34d399; padding: 0; justify-content: flex-end; }
+  .slot.sudah svg { display: none; }
+  .slot .preview { display: none; }
+  .slot.sudah .preview { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+  .slot.sudah .preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .slot .ftr { position: relative; z-index: 2; width: 100%; background: linear-gradient(180deg, rgba(15,23,42,0), rgba(15,23,42,.78)); color: #fff; padding: 22px 8px 6px; display: flex; flex-direction: column; gap: 1px; }
+  .slot .ftr .nama { color: #fff; font-size: 10.5px; text-align: left; }
+  .slot .ftr .meta-foto { font-size: 8.5px; color: #e0f2fe; text-align: left; line-height: 1.4; font-variant-numeric: tabular-nums; }
+  .slot .hapus-foto { position: absolute; top: 6px; right: 6px; z-index: 3; border: none; background: rgba(239,68,68,.92); color: #fff; width: 24px; height: 24px; border-radius: 7px; font-size: 12px; cursor: pointer; line-height: 1; padding: 0; }
+  .slot .ambil-lagi { position: absolute; top: 6px; left: 6px; z-index: 3; border: none; background: rgba(2,132,199,.92); color: #fff; border-radius: 7px; padding: 5px 8px; font-size: 9px; font-weight: 800; cursor: pointer; }
+  .slot .load { display: none; position: absolute; inset: 0; z-index: 4; background: rgba(248,250,252,.85); align-items: center; justify-content: center; flex-direction: column; gap: 8px; font-size: 11px; font-weight: 800; color: #0284c7; }
+  .slot .load.on { display: flex; }
+  .foto-hint { font-size: 11px; color: #94a3b8; margin-bottom: 10px; line-height: 1.5; }
+  .foto-warn { display: none; background: #fffbeb; border: 1px solid #fde68a; color: #b45309; border-radius: 10px; padding: 8px 10px; font-size: 10.5px; font-weight: 700; line-height: 1.5; margin-top: 10px; }
+  .foto-warn.show { display: block; }
+
+  /* EXPORT BAR */
+  .exportbar { position: sticky; bottom: 0; z-index: 40; background: rgba(255,255,255,.95); border-top: 1px solid #e2e8f0; padding: 14px 16px; backdrop-filter: blur(4px); box-shadow: 0 -4px 20px rgba(15,23,42,.08); }
+  .btn-export { width: 100%; border: none; border-radius: 16px; padding: 15px; font-size: 16px; font-weight: 800; color: #fff; background: linear-gradient(90deg, #0284c7, #06b6d4); box-shadow: 0 8px 18px rgba(2,132,199,.3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .1s; }
+  .btn-export:active { transform: scale(.98); }
+  .exportbar p { text-align: center; font-size: 11px; color: #94a3b8; margin-top: 8px; }
+
+  /* MODAL */
+  .overlay { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(15,23,42,.6); align-items: flex-end; justify-content: center; }
+  .overlay.on { display: flex; }
+  .sheet { width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; background: #fff; border-radius: 24px 24px 0 0; padding: 20px; }
+  @media (min-width: 540px) { .overlay.on { align-items: center; padding: 24px; } .sheet { border-radius: 24px; } }
+  /* layar HP sempit: statistik 4 kolom pecah jadi 2 kolom agar angka tidak berhimpitan */
+  @media (max-width: 400px) { .trk-stats { grid-template-columns: repeat(2, 1fr); } }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .sheet-head h2 { font-size: 17px; color: #1e293b; }
+  .btn-tutup { border: none; background: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 800; border-radius: 99px; padding: 6px 12px; cursor: pointer; }
+  .sheet p.sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; }
+  .warn { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; border-radius: 12px; padding: 10px 12px; font-size: 11px; font-weight: 700; margin-bottom: 12px; line-height: 1.5; }
+  .folder-list { display: flex; flex-direction: column; gap: 8px; }
+  .folder-row { display: flex; gap: 12px; align-items: center; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 14px; padding: 10px 12px; }
+  .folder-ico { width: 36px; height: 36px; border-radius: 12px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .folder-ico svg { width: 16px; height: 16px; }
+  .folder-row .nm { font-family: Consolas, monospace; font-size: 12px; font-weight: 800; color: #334155; }
+  .folder-row .isi { font-size: 11px; color: #94a3b8; }
+  .lokasi-box { margin-top: 14px; border: 2px dashed #7dd3fc; background: rgba(240,249,255,.6); border-radius: 16px; padding: 14px; }
+  .lokasi-box .k { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; }
+  .lokasi-box .path { font-family: Consolas, monospace; font-size: 12px; font-weight: 800; color: #0369a1; word-break: break-all; margin-top: 4px; }
+  .btn-lokasi { margin-top: 8px; background: #fff; color: #0284c7; border: 1px solid #bae6fd; border-radius: 99px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .btn-lokasi:active { transform: scale(.95); }
+  .btn-simpan { margin-top: 16px; width: 100%; border: none; border-radius: 16px; padding: 14px; font-size: 14px; font-weight: 800; color: #fff; background: linear-gradient(90deg, #0284c7, #06b6d4); box-shadow: 0 8px 18px rgba(2,132,199,.3); cursor: pointer; }
+  .btn-simpan:active { transform: scale(.98); }
+  .pbar-wrap { margin-top: 16px; }
+  .pbar-txt { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #0369a1; margin-bottom: 8px; }
+  .pbar { height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+  .pbar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #0284c7, #22d3ee); border-radius: 99px; transition: width .1s; }
+  .sukses { text-align: center; padding: 16px 0; }
+  .ok-circle { width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 99px; background: #10b981; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 10px 22px rgba(16,185,129,.4); }
+  .sukses h2 { font-size: 17px; color: #1e293b; }
+  .sukses .path { font-family: Consolas, monospace; font-size: 11px; color: #0369a1; word-break: break-all; margin-top: 6px; }
+  .ok-list { margin: 14px auto 0; max-width: 280px; text-align: left; display: flex; flex-direction: column; gap: 6px; }
+  .ok-list div { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #64748b; }
+  .ok-list b { font-family: Consolas, monospace; }
+  .ok-list i { color: #10b981; font-style: normal; font-weight: 900; }
+  .unduh-note { margin-top: 14px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 10px; font-size: 11px; color: #047857; font-weight: 600; line-height: 1.5; }
+  .btn-selesai { margin-top: 16px; width: 100%; border: none; border-radius: 16px; padding: 12px; font-size: 14px; font-weight: 800; background: #1e293b; color: #fff; cursor: pointer; }
+  .btn-selesai:active { transform: scale(.98); }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <header class="hdr">
+    <div class="brand">🌊 SURVEI TITIK GENANGAN</div>
+    <h1>Form Survei Genangan</h1>
+    <p>Versi v1.2 · Koordinat GPS rata-rata 10 sampel + gerbang mutu · LOKASI SAYA otomatis · Foto ber-stempel · Lokal, tanpa internet.</p>
+    <div class="prog">
+      <i id="seg1"></i><i id="seg2"></i><i id="seg3"></i><i id="seg4"></i>
+      <b id="progTxt">0/4</b>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- LANGKAH 1 : WAKTU -->
+    <section class="card" id="card1">
+      <div class="badge">&#10003;</div>
+      <div class="row">
+        <div class="num">1</div>
+        <div class="content">
+          <h3>Waktu Survei (otomatis)</h3>
+          <div id="waktuBox"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LANGKAH 2 : CUACA -->
+    <section class="card" id="card2">
+      <div class="badge">&#10003;</div>
+      <div class="row">
+        <div class="num">2</div>
+        <div class="content">
+          <h3>Keadaan Cuaca</h3>
+          <div class="cuaca-grid" id="cuacaGrid"></div>
+          <div class="cuaca-note" id="cuacaNote"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LANGKAH 3 : TITIK GENANGAN -->
+    <section class="card" id="card3">
+      <div class="badge">&#10003;</div>
+      <div class="row">
+        <div class="num">3</div>
+        <div class="content">
+          <h3>Titik Genangan</h3>
+
+          <div class="sec-label first"><svg class="gps-ic" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="21.4" rx="4.4" ry="1.5" fill="rgba(15,23,42,.16)"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ef4444" stroke="#333" stroke-width="1.3" stroke-linejoin="round"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg> 3.1 Koordinat (otomatis)</div>
+          <div id="gpsBox"></div>
+          <div id="lokasiBox"></div>
+
+          <div class="sec-label">3.2 Luasan Genangan (satuan mm)</div>
+          <div class="opsi">
+            <button id="btnManual" onclick="setMetode('manual')">Manual</button>
+            <button id="btnOtomatis" onclick="setMetode('otomatis')">Otomatis</button>
+          </div>
+
+          <div id="blokManual"></div>
+          <div id="blokOtomatis" style="display:none"></div>
+
+          <div class="pills">
+            <span class="pill" id="pillKoor">Koordinat</span>
+            <span class="pill" id="pillLuas">Luasan</span>
+            <span class="pill" id="pillDalam">Kedalaman</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LANGKAH 4 : FOTO -->
+    <section class="card" id="card4">
+      <div class="badge">&#10003;</div>
+      <div class="row">
+        <div class="num">4</div>
+        <div class="content">
+          <h3>Foto Bukti</h3>
+          <p class="foto-hint">Tap slot untuk ambil foto (kamera). Foto otomatis diberi stempel metadata di sudut kiri bawah: <b>hari, tanggal, bulan, tahun, jam</b> (sesuai Langkah 1) dan <b>koordinat</b> (sesuai Langkah 3). Tersimpan ke folder 02_FOTO_BUKTI.</p>
+          <div class="foto-grid" id="fotoGrid"></div>
+          <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none" onchange="fotoProses(this)" />
+          <div class="foto-warn" id="fotoWarn"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- EXPORT -->
+  <div class="exportbar">
+    <button class="btn-export" onclick="bukaExport()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export Data
+    </button>
+    <p id="exportStatus">0/4 langkah selesai</p>
+  </div>
+</div>
+
+<!-- MODAL EXPORT -->
+<div class="overlay" id="ovl">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+/* ============================= STATE ============================= */
+var HARI = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+var BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+var CUACA = [
+  { id: "cerah", label: "Cerah", svg: '<svg class="ic" viewBox="0 0 64 64"><g stroke="#f59e0b" stroke-width="3" stroke-linecap="round"><line x1="32" y1="5" x2="32" y2="12"/><line x1="32" y1="52" x2="32" y2="59"/><line x1="5" y1="32" x2="12" y2="32"/><line x1="52" y1="32" x2="59" y2="32"/><line x1="13" y1="13" x2="18" y2="18"/><line x1="46" y1="46" x2="51" y2="51"/><line x1="13" y1="51" x2="18" y2="46"/><line x1="46" y1="18" x2="51" y2="13"/></g><circle cx="32" cy="32" r="15" fill="#fbbf24" stroke="#f59e0b" stroke-width="2.5"/><circle cx="26.5" cy="29.5" r="2.2" fill="#78350f"/><circle cx="37.5" cy="29.5" r="2.2" fill="#78350f"/><path d="M25.5 36 q6.5 5.5 13 0" fill="none" stroke="#78350f" stroke-width="2.2" stroke-linecap="round"/></svg>' },
+  { id: "cerah-berawan", label: "Cerah Berawan", svg: '<svg class="ic" viewBox="0 0 64 64"><g stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"><line x1="44" y1="5" x2="44" y2="10"/><line x1="58" y1="19" x2="53" y2="19"/><line x1="55" y1="8" x2="51.5" y2="11.5"/></g><circle cx="44" cy="19" r="10" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/><g fill="#dbeafe"><circle cx="22" cy="38" r="11"/><circle cx="36" cy="33" r="13"/><circle cx="47" cy="40" r="9"/><rect x="14" y="38" width="38" height="11" rx="5.5"/></g></svg>' },
+  { id: "berawan", label: "Berawan", svg: '<svg class="ic" viewBox="0 0 64 64"><g fill="#7ec0ee"><circle cx="22" cy="34" r="11"/><circle cx="37" cy="29" r="13"/><circle cx="48" cy="36" r="9"/><rect x="14" y="34" width="38" height="11" rx="5.5"/></g></svg>' },
+  { id: "hujan-ringan", label: "Hujan Ringan", svg: '<svg class="ic" viewBox="0 0 64 64"><g fill="#f1f5f9"><circle cx="22" cy="30" r="11"/><circle cx="36" cy="25" r="13"/><circle cx="47" cy="32" r="9"/><rect x="14" y="30" width="38" height="11" rx="5.5"/></g><g stroke="#38bdf8" stroke-width="3" stroke-linecap="round"><line x1="24" y1="46" x2="22" y2="55"/><line x1="34" y1="46" x2="32" y2="58"/><line x1="44" y1="46" x2="42" y2="55"/></g></svg>' },
+  { id: "hujan-lebat", label: "Hujan Lebat", svg: '<svg class="ic" viewBox="0 0 64 64"><g fill="#7ec0ee"><circle cx="21" cy="26" r="11"/><circle cx="35" cy="21" r="13"/><circle cx="47" cy="28" r="9"/><rect x="13" y="26" width="38" height="11" rx="5.5"/></g><g stroke="#2563eb" stroke-width="3" stroke-linecap="round"><line x1="21" y1="42" x2="18" y2="56"/><line x1="31" y1="42" x2="28" y2="60"/><line x1="41" y1="42" x2="38" y2="56"/><line x1="27" y1="42" x2="24" y2="50"/><line x1="37" y1="42" x2="34" y2="50"/></g></svg>' },
+  { id: "badai", label: "Badai / Petir", svg: '<svg class="ic" viewBox="0 0 64 64"><g fill="#7ec0ee"><circle cx="21" cy="22" r="10"/><circle cx="34" cy="18" r="12"/><circle cx="46" cy="24" r="8"/><rect x="13" y="22" width="38" height="10" rx="5"/></g><polygon points="35,34 28,48 33,48 30,59 41,43 35,43 39,34" fill="#fde047" stroke="#ffffff" stroke-width="1.5"/><g stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"><line x1="20" y1="38" x2="17" y2="50"/><line x1="47" y1="38" x2="44" y2="50"/></g></svg>' }
+];
+var FOTO_SLOTS = ["Situasi 1","Situasi 2","Situasi 3","Saluran terdekat"]; // slot foto dinomori agar kunci state & nama file unik
+var FOLDERS = [
+  { nama: "01_DATA_SURVEI", isi: "data_form_genangan_(tanggal-jam).json", ket: "Data lengkap hasil form — nama unik per survei/titik" },
+  { nama: "02_FOTO_BUKTI", isi: "foto .jpg ber-stempel", ket: "Foto + stempel waktu & koordinat di kiri bawah" },
+  { nama: "03_OUTPUT_EXCEL_CSV", isi: "hasil_survei.xlsx · .csv", ket: "Tabel hasil survei" },
+  { nama: "04_OUTPUT_KML_KMZ", isi: "titik_genangan.kml · .kmz", ket: "Peta titik untuk Google Earth" },
+  { nama: "05_OUTPUT_QGZ_GPKG", isi: "proyek_genangan.qgz · .gpkg", ket: "Proyek siap dibuka di QGIS" }
+];
+var folderHandle = null; // handle folder asli hasil "Pilih Folder di Perangkat" (File System Access API)
+
+var st = {
+  waktu: null,
+  cuaca: null,
+  gps: "idle",            // idle | cari | ok | err
+  gpsErr: "",             // pesan error bila GPS gagal / ditolak gerbang mutu (state "err")
+  gpsTh: 5,               // gerbang mutu koordinat 3.1 — ambang akurasi (m), geser 2–15
+  gpsSampel: [],          // sampel GPS yang sedang dirata-ratakan (pengambilan koordinat 3.1)
+  gpsWatch: null,         // watchId GPS aktif untuk pengambilan koordinat 3.1
+  koordinat: null,
+  lokasi: null,           // LOKASI SAYA: { teks: "Jalan …, desa …, kecamatan …, Kabupaten …, provinsi" } — reverse geocoding OSM dari koordinat 3.1
+  lokasiCari: false,      // panel LOKASI SAYA sedang mencari alamat
+  lokasiErr: "",          // pesan galat panel LOKASI SAYA
+  metode: "manual",
+  otomOpsi: "",            // "" | "tracking" | "titik" | "ai"
+  track: { gps: "off", watchId: null, wake: null, origin: null, live: null,
+           avg: null, samples: [], fixes: 0, vertices: [], th: 5, auto: false },
+  tkk: { mode: "manual", gps: "off", watchId: null, wake: null, origin: null,
+         live: null, avg: null, samples: [], th: 5, man: [{ lat: "", lon: "" }], gpsPts: [] },
+  ai: { fotos: [], rodMm: 3000, res: 1600, proses: false, hasil: null, log: [] },
+  panjang: "", lebar: "",
+  panjangEdit: true, lebarEdit: true,
+  bentuk: 1,               // pilihan polyline manual: 1=persegi panjang (2 isian) … 5=segi enam (6 isian)
+  sisi: ["", "", "", "", "", ""],
+  sisiEdit: [true, true, true, true, true, true],
+  kedalaman: [{ id: 1, nilai: "", edit: true }],
+  nextId: 2,
+  foto: {}
+};
+
+var eksStatus = "idle";   // idle | proses | sukses
+var prog = 0;
+var timerSimpan = null;
+
+/* ============================= UTIL ============================= */
+function $(id) { return document.getElementById(id); }
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function angka(s) {
+  if (s === null || s === undefined) return null;
+  s = String(s).replace(",", ".").trim();
+  if (s === "") return null;
+  var v = parseFloat(s);
+  return isFinite(v) && v >= 0 ? v : null;
+}
+function fmtNum(n, d) {
+  if (d === undefined) d = 1;
+  try { return n.toLocaleString("id-ID", { maximumFractionDigits: d }); }
+  catch (e) { return String(Math.round(n * 10) / 10); }
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* ============================= HITUNGAN ============================= */
+function luasHitung() {
+  if (st.metode === "manual") {
+    if (st.bentuk === 1) { // 2 polyline — persegi panjang
+      var p = angka(st.panjang), l = angka(st.lebar);
+      if (p !== null && l !== null && p > 0 && l > 0) return (p * l) / 1000000; // 0 ditolak — konsisten dengan bentuk lain
+      return null;
+    }
+    var n = st.bentuk + 1, s = [], i;
+    for (i = 0; i < n; i++) {
+      var v = angka(st.sisi[i]);
+      if (v === null || v <= 0) return null;
+      s.push(v);
+    }
+    var luasMM = null;
+    if (st.bentuk === 2) { // 3 polyline — segi tiga (Heron)
+      var sp = (s[0] + s[1] + s[2]) / 2;
+      if (s[0] + s[1] > s[2] && s[0] + s[2] > s[1] && s[1] + s[2] > s[0])
+        luasMM = Math.sqrt(Math.max(0, sp * (sp - s[0]) * (sp - s[1]) * (sp - s[2])));
+    } else if (st.bentuk === 3) { // 4 polyline — segi empat (Brahmagupta; asumsi segi empat siklik ≈ trapesium/jajar genjang)
+      var sq = (s[0] + s[1] + s[2] + s[3]) / 2;
+      var f = (sq - s[0]) * (sq - s[1]) * (sq - s[2]) * (sq - s[3]);
+      if (f > 0) luasMM = Math.sqrt(f);
+    } else if (st.bentuk === 4) { // 5 polyline — segi lima ~ beraturan (sisi rata-rata)
+      var mp = (s[0] + s[1] + s[2] + s[3] + s[4]) / 5;
+      luasMM = 0.25 * Math.sqrt(5 * (5 + 2 * Math.sqrt(5))) * mp * mp;
+    } else { // 6 polyline — segi enam ~ beraturan (sisi rata-rata)
+      var mh = 0;
+      for (i = 0; i < 6; i++) mh += s[i];
+      mh /= 6;
+      luasMM = 1.5 * Math.sqrt(3) * mh * mh;
+    }
+    return luasMM !== null ? luasMM / 1000000 : null; // mm² → m²
+  }
+  if (st.otomOpsi === "tracking") return st.track.vertices.length >= 3 ? trkShoelace(st.track.vertices) : null;
+  if (st.otomOpsi === "titik") {
+    var V = tkkVertices();
+    return V.length >= 3 ? trkShoelace(tkkXY(V)) : null;
+  }
+  if (st.otomOpsi === "ai") return st.ai.hasil && st.ai.hasil.luas !== null ? st.ai.hasil.luas : null;
+  return null;
+}
+function nilaiKedalaman() {
+  var out = [];
+  for (var i = 0; i < st.kedalaman.length; i++) {
+    var v = angka(st.kedalaman[i].nilai);
+    if (v !== null) out.push(v);
+  }
+  return out;
+}
+function dRata() {
+  var arr = nilaiKedalaman();
+  if (!arr.length) return null;
+  var s = 0;
+  for (var i = 0; i < arr.length; i++) s += arr[i];
+  return s / arr.length;
+}
+function volumeHitung() {
+  var lu = luasHitung(), dr = dRata();
+  if (lu !== null && dr !== null) return (lu * dr) / 1000;
+  return null;
+}
+function langkah1() { return !!st.waktu; }
+function langkah2() { return !!st.cuaca; }
+function langkah3() {
+  if (!st.koordinat) return false;
+  if (st.metode === "otomatis") {
+    if (st.otomOpsi === "tracking" || st.otomOpsi === "titik" || st.otomOpsi === "ai") return luasHitung() !== null; // minimal 3 titik / hasil analisis AI → luas valid
+    return st.otomOpsi !== ""; // opsi terpilih namun belum menghasilkan luas valid
+  }
+  return luasHitung() !== null; // kedalaman opsional — tanpa kedalaman hasil hanya luas, centang kartu tetap muncul
+}
+function langkah4() {
+  // Foto Bukti bersifat opsional — tidak ada foto yang diminta.
+  // Langkah 4 dianggap selesai bila seluruh langkah wajib (1–3) sudah lengkap,
+  // sehingga progres bisa mencapai 4/4 tanpa satu pun foto; foto yang sudah
+  // diambil tetap ikut terekam di JSON, arsip .zip, dan folder 02_FOTO_BUKTI.
+  return langkah1() && langkah2() && langkah3();
+}
+
+/* ============================= AKSI ============================= */
+function ambilWaktu() { st.waktu = new Date(); renderAll(); }
+function pilihCuaca(id) { st.cuaca = id; renderAll(); }
+
+function ambilKoordinat() {
+  if (st.gps === "cari") return;
+  st.koordinat = null; st.lokasi = null; st.lokasiErr = ""; st.gpsErr = "";
+  st.gpsSampel = [];
+  st.gps = "cari"; renderAll(); // koordinat baru → alamat lama otomatis dikosongkan agar tidak tertukar
+  /* GPS ASLI PERANGKAT SAJA (GitHub Pages = HTTPS, izin lokasi aktif) — TANPA simulasi:
+     data resmi hanya dari GPS nyata. Prinsip sama dengan mode titik keliling:
+     rata-rata 10 sampel + gerbang mutu ambang akurasi; gagal → pesan jelas, coba lagi. */
+  if (!navigator.geolocation || !window.isSecureContext) {
+    koordinatGagal("GPS perangkat tidak tersedia — pastikan form dibuka via HTTPS (GitHub Pages) dan izin lokasi aktif.");
+    return;
+  }
+  st.gpsWatch = navigator.geolocation.watchPosition(function (p) {
+    st.gpsSampel.push({ lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy || 30 });
+    renderGps();
+    if (st.gpsSampel.length >= TRK_NEED) koordinatSelesai();
+  }, function () {
+    koordinatGagal("Sinyal GPS tidak ditemukan — aktifkan lokasi, buka di tempat langit terbuka, lalu coba lagi.");
+  }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+}
+/* GPS gagal / ditolak → koordinat tetap KOSONG (Langkah 3 belum selesai, export terblokir) */
+function koordinatGagal(pesan) {
+  if (st.gpsWatch !== null && navigator.geolocation) navigator.geolocation.clearWatch(st.gpsWatch);
+  st.gpsWatch = null; st.gpsSampel = [];
+  st.gps = "err"; st.gpsErr = pesan;
+  renderAll();
+}
+/* 10 sampel terkumpul → rata-rata → gerbang mutu → kunci koordinat → LOKASI SAYA otomatis */
+function koordinatSelesai() {
+  if (st.gpsWatch !== null && navigator.geolocation) navigator.geolocation.clearWatch(st.gpsWatch);
+  st.gpsWatch = null;
+  var n = st.gpsSampel.length, la = 0, lo = 0, ac = 0;
+  for (var i = 0; i < n; i++) { la += st.gpsSampel[i].lat; lo += st.gpsSampel[i].lon; ac += st.gpsSampel[i].acc; }
+  la /= n; lo /= n; ac /= n;
+  st.gpsSampel = [];
+  if (ac > st.gpsTh) {
+    koordinatGagal("Ditolak: akurasi rata-rata ±" + fmtNum(ac, 1) + " m melebihi ambang ±" + st.gpsTh + " m — buka langit terbuka lalu coba lagi.");
+    return;
+  }
+  st.koordinat = { lat: la, lon: lo, akurasi: Math.round(ac) };
+  st.gps = "ok"; st.gpsErr = "";
+  renderAll();
+  ambilLokasi(); // LOKASI SAYA otomatis terambil begitu koordinat terkunci
+}
+
+/* ===== LOKASI SAYA — alamat otomatis dari koordinat 3.1 (reverse geocoding OSM/Nominatim) =====
+   Alamat tersusun berjenjang: nama jalan → desa → kecamatan → kabupaten → provinsi;
+   bagian yang tidak tersedia dilewati (tanpa nama jalan → mulai dari desa, dst.),
+   contoh: "Jalan xxx, desa yyy, kecamatan Karang Baru, Kabupaten Aceh Tamiang, Aceh".
+   Hasilnya menjadi metadata stempel foto BARIS KE-3 (tepat di bawah koordinat)
+   dan direkam di JSON sebagai "lokasi_saya" + "foto_bukti[].lokasi". */
+var ICON_GPS = '<svg class="gps-ic" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="21.4" rx="4.4" ry="1.5" fill="rgba(15,23,42,.16)"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ef4444" stroke="#333" stroke-width="1.3" stroke-linejoin="round"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg>';
+function ambilLokasi() {
+  if (st.lokasiCari) return;
+  if (st.gps === "cari") { st.lokasiErr = "Koordinat masih dicari — tunggu sebentar lalu ketuk LOKASI SAYA lagi."; renderLokasi(); return; }
+  if (!st.koordinat) { st.lokasiErr = "Ambil koordinat 3.1 terlebih dahulu — LOKASI SAYA mengambil alamat dari koordinat itu."; renderLokasi(); return; }
+  st.lokasiErr = ""; st.lokasi = null; st.lokasiCari = true; renderLokasi();
+  var u = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + st.koordinat.lat.toFixed(6) +
+          "&lon=" + st.koordinat.lon.toFixed(6) + "&zoom=18&addressdetails=1&accept-language=id";
+  fetch(u).then(function (r) { return r.json(); }).then(function (j) {
+    st.lokasiCari = false;
+    var teks = susunLokasi(j);
+    if (teks) { st.lokasi = { teks: teks }; st.lokasiErr = ""; }
+    else st.lokasiErr = "Alamat tidak ditemukan untuk koordinat ini.";
+    renderLokasi();
+  }).catch(function () {
+    st.lokasiCari = false;
+    st.lokasiErr = "Alamat tidak dapat diambil — periksa koneksi internet lalu ketuk lagi.";
+    renderLokasi();
+  });
+}
+function susunLokasi(j) {
+  if (!j) return "";
+  var a = j.address;
+  if (!a) return j.display_name || "";
+  var parts = [];
+  if (a.road) parts.push(a.road); // nama jalan; bila tidak ada, otomatis mulai dari desa — dst.
+  var desa = a.village || a.hamlet || a.suburb || a.neighbourhood || a.quarter || a.town || a.city_district || a.city;
+  if (desa) parts.push(desa);
+  if (a.municipality && a.municipality !== desa) parts.push(a.municipality);
+  if (a.county && a.county !== desa) parts.push("kecamatan " + a.county);
+  if (a.state_district) parts.push("Kabupaten " + a.state_district);
+  if (a.state) parts.push(a.state);
+  return parts.join(", ");
+}
+function renderLokasi() {
+  var box = $("lokasiBox"); if (!box) return;
+  if (st.lokasiCari) {
+    box.innerHTML = '<div class="gps-cari"><span class="dot"></span>Mencari alamat lokasi…</div>';
+    return;
+  }
+  var h = "";
+  if (st.lokasi) {
+    h = '<div class="lokasi-hasil">' + ICON_GPS + '<div style="min-width:0">' +
+      '<div class="teks">' + esc(st.lokasi.teks) + '</div>' +
+      '<div class="meta"><a onclick="ambilLokasi()">Ambil ulang</a></div></div></div>';
+  } else {
+    h = '<button class="tap-box lokasi-tap" onclick="ambilLokasi()">' + ICON_GPS +
+      'LOKASI SAYA<small>Alamat terisi otomatis dari koordinat 3.1 — hasilnya menjadi baris alamat pada stempel foto</small></button>';
+  }
+  if (st.lokasiErr) h += '<div class="lokasi-err">' + esc(st.lokasiErr) + '</div>';
+  box.innerHTML = h;
+}
+
+/* ===== Opsi Mode Otomatis (3.2 Luasan Genangan): 1. TRACKING, 2. TITIK KOORDINAT, 3. AI ===== */
+var OPSI_OTOM_LABEL = { tracking: "TRACKING", titik: "TITIK KOORDINAT", ai: "AI" };
+var OPSI_OTOM = [
+  { key: "tracking", label: "TRACKING",
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="2.2"/><circle cx="19" cy="19" r="2.2"/><path d="M7 5.5h6a4 4 0 0 1 0 8H9a4 4 0 0 0 0 8h8"/></svg>' },
+  { key: "titik", label: "TITIK KOORDINAT",
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' },
+  { key: "ai", label: "AI",
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg>' }
+];
+function opsiOtomKartu(o, i) {
+  var on = st.otomOpsi === o.key ? " on" : "";
+  return '<div class="kartu-opsi' + on + '" onclick="setOtomOpsi(\'' + o.key + '\')">' +
+    '<span class="no">' + (i + 1) + '</span>' + o.svg +
+    '<span class="nama">' + o.label + '</span>' +
+    '<span class="cek">✓</span></div>';
+}
+function setOtomOpsi(k) {
+  if (st.otomOpsi === "tracking" && k !== "tracking") trkStop(true); // tinggalkan tracking → matikan GPS
+  if (st.otomOpsi === "titik" && k !== "titik") tkkStop(true);      // tinggalkan titik koordinat → matikan GPS
+  st.otomOpsi = k;
+  renderBlokManual(); renderPills(); renderProg();
+}
+
+/* ===== ALUR LOGIKA 1: TRACKING — luas dari jejak keliling batas genangan =====
+   Diadaptasi dari contoh "Tracking Luas" pengguna (metodologi, bukan mentah):
+   - surveyor mengelilingi batas genangan; di tiap pojok "Tetapkan titik sudut";
+   - tiap titik sudut dirata-ratakan dari 10 sampel GPS + gerbang mutu akurasi (ambang);
+   - opsional "catat otomatis tiap 8 m" untuk batas tidak berpojok (mode kasar);
+   - luas poligon (shoelace) otomatis jadi hasil LUAS proyek (+ volume dgn kedalaman manual);
+   - "Ekspor GeoJSON" KONDISIONAL dan hasilnya TIDAK terekam dalam 5 folder output (01–05).
+   Bila GPS perangkat tidak tersedia (mis. dibuka lokal / bukan https) atau izin ditolak,
+   status error jelas ditampilkan — TANPA MODE SIMULASI: data resmi hanya dari GPS asli. */
+var TRK_NEED = 10, TRK_AUTO_M = 8; // 10 sampel GPS per titik (rata-rata + gerbang mutu)
+
+function trkToXY(lat, lng) {
+  var o = st.track.origin;
+  return { x: (lng - o.lng) * 111320 * Math.cos(o.lat * Math.PI / 180), y: -(lat - o.lat) * 110540 };
+}
+function trkStatus(txt, cls) {
+  var el = $("trkStatus");
+  if (el) { el.textContent = txt; el.className = "trk-status" + (cls ? " " + cls : ""); }
+}
+function trkStart() {
+  var t = st.track;
+  if (t.gps !== "off") return;
+  t.gps = "wait"; renderTrack();
+  trkStatus("Menghubungkan GPS…", "wait");
+  if (!navigator.geolocation || !window.isSecureContext) { trkGpsGagal(); return; }
+  t.watchId = navigator.geolocation.watchPosition(function (p) {
+    trkOnFix(p.coords.latitude, p.coords.longitude, p.coords.accuracy || 30);
+  }, function () {
+    trkWatchOff(); trkGpsGagal();
+  }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+  try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (w) { t.wake = w; }).catch(function () {}); } catch (e) {}
+}
+function trkWatchOff() {
+  var t = st.track;
+  if (t.watchId !== null && navigator.geolocation) navigator.geolocation.clearWatch(t.watchId);
+  t.watchId = null;
+  if (t.wake) { try { t.wake.release(); } catch (e) {} t.wake = null; }
+}
+/* GPS tidak tersedia / izin ditolak → error jujur, TANPA data simulasi (data resmi hanya GPS asli) */
+function trkGpsGagal() {
+  st.track.gps = "off";
+  trkStatus("GPS tidak tersedia — aktifkan izin lokasi & buka via HTTPS (GitHub Pages)", "bad");
+  renderTrack();
+}
+function trkOnFix(lat, lng, acc) {
+  var t = st.track;
+  if (!t.origin) { t.origin = { lat: lat, lng: lng }; trkStatus("Titik nol terkunci. Mulai kelilingi batas genangan", "on"); }
+  var xy = trkToXY(lat, lng);
+  t.live = { x: xy.x, y: xy.y, acc: acc, lat: lat, lng: lng };
+  t.gps = "on"; t.fixes++;
+  if (t.avg) {
+    t.samples.push({ x: xy.x, y: xy.y, acc: acc, lat: lat, lng: lng });
+    t.avg.n = t.samples.length;
+    if (t.avg.n >= TRK_NEED) trkFinishAvg();
+  }
+  trkAutoAdd();
+  renderTrack();
+}
+function trkFinishAvg() {
+  var t = st.track, n = t.samples.length;
+  var m = function (k) { var s = 0; for (var i = 0; i < n; i++) s += t.samples[i][k]; return s / n; };
+  var r = { x: m("x"), y: m("y"), acc: m("acc"), lat: m("lat"), lng: m("lng") };
+  t.samples = []; t.avg = null;
+  if (r.acc > t.th) {
+    trkStatus("Ditolak: akurasi rata-rata ±" + fmtNum(r.acc, 1) + " m melebihi ambang ±" + t.th + " m. Coba lagi", "bad");
+  } else {
+    t.vertices.push(r);
+    trkStatus("Titik " + t.vertices.length + " terkunci ±" + fmtNum(r.acc, 1) + " m (rata-rata " + n + " sampel)", "on");
+    if (navigator.vibrate) navigator.vibrate(60);
+    renderHasil(); renderPills(); renderProg();
+  }
+}
+function trkAutoAdd() {
+  var t = st.track;
+  if (!t.auto || !t.live || t.live.acc > t.th) return;
+  var l = t.vertices[t.vertices.length - 1];
+  if (!l || Math.hypot(l.x - t.live.x, l.y - t.live.y) >= TRK_AUTO_M) {
+    t.vertices.push({ x: t.live.x, y: t.live.y, acc: t.live.acc, lat: t.live.lat, lng: t.live.lng });
+    if (navigator.vibrate) navigator.vibrate(40);
+    renderHasil(); renderPills(); renderProg();
+  }
+}
+function tetapkanTitik() {
+  var t = st.track;
+  if (t.avg || !t.live) return;
+  t.samples = []; t.avg = { n: 0 };
+  trkStatus("Diam di titik sudut. Mengumpulkan " + TRK_NEED + " sampel GPS…", "wait");
+  renderTrack();
+}
+function undoTitik() {
+  st.track.vertices.pop();
+  renderTrack(); renderHasil(); renderPills(); renderProg();
+  trkStatus("Titik terakhir dibatalkan", "bad");
+}
+function resetTitik() {
+  st.track.vertices = [];
+  renderTrack(); renderHasil(); renderPills(); renderProg();
+  trkStatus("Poligon direset — luas dikosongkan", "bad");
+}
+function toggleTrkAuto() {
+  var t = st.track;
+  t.auto = !t.auto; renderTrack();
+  trkStatus(t.auto ? "Catat otomatis tiap " + TRK_AUTO_M + " m AKTIF (mode kasar)" : "Catat otomatis nonaktif — pakai Tetapkan titik sudut untuk presisi", t.auto ? "on" : "");
+}
+function setTrkTh(v) {
+  st.track.th = +v;
+  var el = $("trkThV"); if (el) el.textContent = v;
+  renderTrack();
+}
+function trkStop(silent) {
+  var t = st.track;
+  trkWatchOff();
+  t.gps = "off"; t.live = null; t.avg = null; t.samples = [];
+  renderTrack();
+  if (!silent) trkStatus("GPS dihentikan", "bad");
+}
+function trkGoBtn() { if (st.track.gps === "off") trkStart(); else trkStop(); }
+function trkShoelace(p) {
+  var s = 0;
+  for (var i = 0; i < p.length; i++) { var a = p[i], b = p[(i + 1) % p.length]; s += a.x * b.y - b.x * a.y; }
+  return Math.abs(s) / 2;
+}
+function trkPerim(p) {
+  var s = 0;
+  if (p.length < 2) return 0;
+  for (var i = 0; i < p.length; i++) { var a = p[i], b = p[(i + 1) % p.length]; s += Math.hypot(a.x - b.x, a.y - b.y); }
+  return s;
+}
+function trkSkeleton() {
+  return '<div class="trk-box" id="trkBox">' +
+    '<div class="trk-head"><b>1. TRACKING — kelilingi batas genangan</b>' +
+      '<span class="trk-status" id="trkStatus">GPS mati</span></div>' +
+    '<div class="trk-map"><svg id="trkMap" viewBox="0 0 110 80" preserveAspectRatio="xMidYMid meet"></svg></div>' +
+    '<div class="trk-empty" id="trkEmpty">Tekan ▶ Mulai GPS, lalu berdiri di tiap pojok batas genangan dan tekan "Tetapkan titik sudut". Minimal 3 titik → luas poligon otomatis.</div>' +
+    '<div class="trk-row">' +
+      '<button class="trk-btn trk-go" id="trkGo" onclick="trkGoBtn()">▶ Mulai GPS</button>' +
+      '<button class="trk-btn trk-ic" id="trkUndo" title="Batalkan titik terakhir" onclick="undoTitik()">↩</button>' +
+      '<button class="trk-btn trk-ic del" id="trkReset" title="Reset poligon" onclick="resetTitik()">✕</button>' +
+    '</div>' +
+    '<button class="trk-btn trk-vtx" id="trkVtx" onclick="tetapkanTitik()" disabled><i></i><span id="trkVtxT">Tetapkan titik sudut</span></button>' +
+    '<button class="trk-btn trk-auto" id="trkAuto" onclick="toggleTrkAuto()">Catat otomatis tiap ' + TRK_AUTO_M + ' m — NONAKTIF</button>' +
+    '<div class="trk-mini">' +
+      '<div class="trk-opt"><b>Gerbang mutu — ambang akurasi</b>Titik ditolak otomatis bila akurasinya lebih buruk dari ±<span id="trkThV">' + st.track.th + '</span> m. GPS HP biasanya ±3–8 m; longgarkan bila sinyal sulit.<input type="range" min="2" max="15" step="1" value="' + st.track.th + '" oninput="setTrkTh(this.value)"></div>' +
+      '<div class="trk-opt"><b>Cara kerja surveyor</b>1) Mulai GPS. 2) Kelilingi batas genangan. 3) Di tiap pojok: diam & tekan "Tetapkan titik sudut" (dirata-ratakan ' + TRK_NEED + ' sampel). 4) Selesai — luas poligon otomatis masuk ke hasil Luas.</div>' +
+    '</div>' +
+    '<div class="trk-stats">' +
+      '<div><div class="k">Titik sudut</div><div class="v" id="trkStatN">0</div><div class="u">titik</div></div>' +
+      '<div><div class="k">Keliling</div><div class="v" id="trkStatP">0 m</div><div class="u">meter</div></div>' +
+      '<div><div class="k">Akurasi rata²</div><div class="v" id="trkStatA">—</div><div class="u">meter</div></div>' +
+      '<div><div class="k">Luas poligon</div><div class="v" id="trkStatL">—</div><div class="u">m²</div></div>' +
+    '</div>' +
+    '<div class="trk-listhead"><span>Daftar titik sudut</span><button class="trk-chip" id="trkExp" onclick="eksporGeoJSONTrack()" disabled>Ekspor GeoJSON</button></div>' +
+    '<div id="trkList"></div>' +
+    '<div class="trk-note">Ekspor GeoJSON bersifat <b>kondisional</b> dan hasilnya <b>tidak terekam</b> dalam 5 folder output proyek (01–05).</div>' +
+  '</div>';
+}
+function renderTrack() {
+  var el = $("trkBox"); if (!el) return;
+  var t = st.track, NSV = 'vector-effect="non-scaling-stroke"';
+  var svg = $("trkMap"), P = t.vertices.slice();
+  if (t.live) P.push(t.live);
+  var h = "";
+  if (P.length) {
+    var vb = { x: 0, y: 0, w: 110, h: 80 };
+    var xs = P.map(function (p) { return p.x; }), ys = P.map(function (p) { return p.y; });
+    var x0 = Math.min.apply(0, xs), x1 = Math.max.apply(0, xs), y0 = Math.min.apply(0, ys), y1 = Math.max.apply(0, ys);
+    var pad = Math.max(15, (x1 - x0 + y1 - y0) / 6), w = x1 - x0 + 2 * pad, hh = y1 - y0 + 2 * pad, R = 1.375;
+    if (w / hh > R) hh = w / R; else w = hh * R;
+    vb = { x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - hh / 2, w: w, h: hh };
+    var k = vb.w / 110;
+    var pts = function (a) { return a.map(function (p) { return p.x + "," + p.y; }).join(" "); };
+    if (t.vertices.length >= 3) h += '<polygon points="' + pts(t.vertices) + '" fill="rgba(2,132,199,.18)" stroke="#0284c7" stroke-width="2.5" stroke-linejoin="round" ' + NSV + '/>';
+    else if (t.vertices.length === 2) h += '<line x1="' + t.vertices[0].x + '" y1="' + t.vertices[0].y + '" x2="' + t.vertices[1].x + '" y2="' + t.vertices[1].y + '" stroke="#0284c7" stroke-width="2.5" ' + NSV + '/>';
+    var last = t.vertices[t.vertices.length - 1];
+    if (last && t.live) h += '<line x1="' + last.x + '" y1="' + last.y + '" x2="' + t.live.x + '" y2="' + t.live.y + '" stroke="#0284c7" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="3 4" ' + NSV + '/>';
+    for (var i = 0; i < t.vertices.length; i++) {
+      var v = t.vertices[i];
+      h += '<circle cx="' + v.x + '" cy="' + v.y + '" r="' + (2.1 * k) + '" fill="#fff" stroke="#0369a1" stroke-width="' + (.9 * k) + '"/>' +
+           '<text x="' + v.x + '" y="' + (v.y + 1.15 * k) + '" font-size="' + (3 * k) + '" font-weight="700" text-anchor="middle" fill="#0369a1">' + (i + 1) + '</text>';
+    }
+    if (t.live) {
+      var ok = t.live.acc <= t.th, c = ok ? "#10b981" : "#f87171", rr = Math.min(t.live.acc, vb.w * .4);
+      h += '<circle cx="' + t.live.x + '" cy="' + t.live.y + '" r="' + rr + '" fill="' + c + '" fill-opacity=".13" stroke="' + c + '" stroke-opacity=".55" ' + NSV + '/>' +
+           '<circle class="trk-pulse" cx="' + t.live.x + '" cy="' + t.live.y + '" r="' + (2 * k) + '" fill="' + c + '"/>' +
+           '<circle cx="' + t.live.x + '" cy="' + t.live.y + '" r="' + (1.7 * k) + '" fill="' + c + '" stroke="#fff" stroke-width="' + (.6 * k) + '"/>';
+    }
+    svg.setAttribute("viewBox", vb.x + " " + vb.y + " " + vb.w + " " + vb.h);
+  } else {
+    svg.setAttribute("viewBox", "0 0 110 80");
+  }
+  svg.innerHTML = h;
+  $("trkEmpty").style.display = (t.live || t.vertices.length) ? "none" : "block";
+  var go = $("trkGo");
+  go.textContent = t.gps === "off" ? "▶ Mulai GPS" : "■ Hentikan GPS";
+  go.className = "trk-btn trk-go" + (t.gps === "on" ? " rec" : "");
+  var vtx = $("trkVtx");
+  vtx.disabled = !t.live || !!t.avg;
+  $("trkVtxT").textContent = t.avg ? "Merata-ratakan " + t.avg.n + "/" + TRK_NEED + " sampel…" : "Tetapkan titik sudut";
+  vtx.style.setProperty("--p", t.avg ? t.avg.n / TRK_NEED : 0);
+  $("trkUndo").disabled = !t.vertices.length;
+  $("trkReset").disabled = !t.vertices.length;
+  var au = $("trkAuto");
+  au.className = "trk-btn trk-auto" + (t.auto ? " on" : "");
+  au.textContent = "Catat otomatis tiap " + TRK_AUTO_M + " m — " + (t.auto ? "AKTIF (mode kasar)" : "NONAKTIF");
+  var A = t.vertices.length >= 3 ? trkShoelace(t.vertices) : 0;
+  $("trkStatN").textContent = t.vertices.length;
+  $("trkStatP").textContent = fmtNum(trkPerim(t.vertices), 0) + " m";
+  $("trkStatA").textContent = t.vertices.length ? "±" + fmtNum(t.vertices.reduce(function (s, v) { return s + v.acc; }, 0) / t.vertices.length, 1) + " m" : "—";
+  $("trkStatL").textContent = t.vertices.length >= 3 ? fmtNum(A, 0) : "—";
+  var rows = "";
+  for (var i2 = 0; i2 < t.vertices.length; i2++) {
+    var v2 = t.vertices[i2];
+    rows += '<div class="trk-rowitem"><span>' + (i2 + 1) + '. <span class="co">' + v2.lat.toFixed(6) + ", " + v2.lng.toFixed(6) + '</span></span><span class="q">±' + fmtNum(v2.acc, 1) + ' m</span></div>';
+  }
+  $("trkList").innerHTML = rows;
+  $("trkExp").disabled = t.vertices.length < 3;
+}
+/* Kondisional: unduh GeoJSON poligon — DI LUAR output 5 folder proyek */
+function eksporGeoJSONTrack() {
+  var t = st.track;
+  if (t.vertices.length < 3) return;
+  var c = t.vertices.map(function (v) { return [v.lng, v.lat]; });
+  c.push(c[0]);
+  var gj = { type: "Feature", properties: { area_m2: Number(trkShoelace(t.vertices).toFixed(2)), perimeter_m: Number(trkPerim(t.vertices).toFixed(2)), n_points: t.vertices.length }, geometry: { type: "Polygon", coordinates: [c] } };
+  try {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(gj, null, 2)], { type: "application/geo+json" }));
+    a.download = "tracking-luasan-genangan.geojson";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    trkStatus("GeoJSON diunduh (kondisional — tidak terekam di 5 folder output)", "sim");
+  } catch (e) { trkStatus("Unduhan diblokir di tampilan ini", "bad"); }
+}
+
+/* ===== ALUR LOGIKA 2: TITIK KOORDINAT — luas dari pojok batas genangan =====
+   Diadaptasi dari contoh "Luas Titik Koordinat v2" pengguna (metodologi, bukan mentah):
+   - dua cara input: ketik/tempel Lintang-Bujur tiap pojok (manual) ATAU GPS HP di tiap pojok;
+   - GPS HP: "Ambil titik" dirata-ratakan 10 sampel + gerbang mutu akurasi (ambang);
+   - poligon ≥3 titik → luas shoelace otomatis jadi hasil LUAS proyek (+ volume dgn kedalaman manual);
+   - deteksi sisi saling berpotongan (urutan titik keliru) → peringatan;
+   - "Ekspor dan simpan" (KML/CSV/GeoJSON) KONDISIONAL dan TIDAK terekam dalam 5 folder output (01–05). */
+function tkkNum(v) {
+  if (v === "" || v == null) return null;
+  var n = parseFloat(String(v).trim().replace(",", "."));
+  return isFinite(n) ? n : null;
+}
+function tkkVertices() {
+  var out = [];
+  if (st.tkk.mode === "manual") {
+    for (var i = 0; i < st.tkk.man.length; i++) {
+      var la = tkkNum(st.tkk.man[i].lat), lo = tkkNum(st.tkk.man[i].lon);
+      if (la !== null && lo !== null && Math.abs(la) <= 90 && Math.abs(lo) <= 180) out.push({ lat: la, lon: lo });
+    }
+  } else {
+    for (var j = 0; j < st.tkk.gpsPts.length; j++) out.push({ lat: st.tkk.gpsPts[j].lat, lon: st.tkk.gpsPts[j].lon, acc: st.tkk.gpsPts[j].acc });
+  }
+  return out;
+}
+function tkkLL2XY(lat, lon, o) {
+  return { x: (lon - o.lon) * 111320 * Math.cos(o.lat * Math.PI / 180), y: -(lat - o.lat) * 110540 };
+}
+function tkkXY(V) {
+  var o = { lat: V[0].lat, lon: V[0].lon }, out = [];
+  for (var i = 0; i < V.length; i++) out.push(tkkLL2XY(V[i].lat, V[i].lon, o));
+  return out;
+}
+function tkkSelfX(P) {
+  var n = P.length; if (n < 4) return false;
+  function cr(a, b, c) { return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x); }
+  for (var i = 0; i < n; i++) for (var j = i + 1; j < n; j++) {
+    if (j === i + 1 || (i === 0 && j === n - 1)) continue;
+    var a = P[i], b = P[(i + 1) % n], c = P[j], d = P[(j + 1) % n];
+    if (cr(a, b, c) * cr(a, b, d) < 0 && cr(c, d, a) * cr(c, d, b) < 0) return true;
+  }
+  return false;
+}
+function tkkStatus(txt, cls) {
+  var el = $("tkkStatus");
+  if (el) { el.textContent = txt; el.className = "trk-status" + (cls ? " " + cls : ""); }
+}
+function tkkSetMode(m) {
+  if (st.tkk.mode === m) return;
+  if (st.tkk.mode === "gps") tkkStop(true); // pindah cara input → matikan GPS
+  st.tkk.mode = m;
+  renderTkk(); renderHasil(); renderPills(); renderProg();
+}
+function tkkStart() {
+  var t = st.tkk;
+  if (t.gps !== "off") return;
+  t.gps = "wait"; renderTkk();
+  tkkStatus("Menghubungkan GPS…", "wait");
+  if (!navigator.geolocation || !window.isSecureContext) { tkkGpsGagal(); return; }
+  t.watchId = navigator.geolocation.watchPosition(function (p) {
+    tkkOnFix(p.coords.latitude, p.coords.longitude, p.coords.accuracy || 30);
+  }, function () {
+    tkkWatchOff(); tkkGpsGagal();
+  }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+  try { if (navigator.wakeLock) navigator.wakeLock.request("screen").then(function (w) { t.wake = w; }).catch(function () {}); } catch (e) {}
+}
+function tkkWatchOff() {
+  var t = st.tkk;
+  if (t.watchId !== null && navigator.geolocation) navigator.geolocation.clearWatch(t.watchId);
+  t.watchId = null;
+  if (t.wake) { try { t.wake.release(); } catch (e) {} t.wake = null; }
+}
+/* GPS tidak tersedia / izin ditolak → error jujur, TANPA data simulasi (data resmi hanya GPS asli) */
+function tkkGpsGagal() {
+  st.tkk.gps = "off";
+  tkkStatus("GPS tidak tersedia — aktifkan izin lokasi & buka via HTTPS (GitHub Pages)", "bad");
+  renderTkk();
+}
+function tkkOnFix(lat, lng, acc) {
+  var t = st.tkk;
+  if (!t.origin) { t.origin = { lat: lat, lon: lng }; tkkStatus("Titik nol terkunci. Berdiri di tiap pojok batas genangan, lalu Ambil titik", "on"); }
+  t.live = { lat: lat, lng: lng, acc: acc };
+  t.gps = "on";
+  if (t.avg) {
+    t.samples.push({ lat: lat, lon: lng, acc: acc });
+    t.avg.n = t.samples.length;
+    if (t.avg.n >= TRK_NEED) tkkFinishAvg();
+  }
+  renderTkk();
+}
+function tkkFinishAvg() {
+  var t = st.tkk, n = t.samples.length, la = 0, lo = 0, ac = 0;
+  for (var i = 0; i < n; i++) { la += t.samples[i].lat; lo += t.samples[i].lon; ac += t.samples[i].acc; }
+  la /= n; lo /= n; ac /= n;
+  t.samples = []; t.avg = null;
+  if (ac > t.th) {
+    tkkStatus("Ditolak: akurasi rata-rata ±" + fmtNum(ac, 1) + " m melebihi ambang ±" + t.th + " m. Coba lagi", "bad");
+  } else {
+    t.gpsPts.push({ lat: la, lon: lo, acc: ac });
+    tkkStatus("Titik " + t.gpsPts.length + " terkunci ±" + fmtNum(ac, 1) + " m (rata-rata " + n + " sampel)", "on");
+    if (navigator.vibrate) navigator.vibrate(60);
+    renderHasil(); renderPills(); renderProg();
+  }
+}
+function tkkAmbilTitik() {
+  var t = st.tkk;
+  if (t.avg || !t.live) return;
+  t.samples = []; t.avg = { n: 0 };
+  tkkStatus("Diam di pojok batas genangan. Mengumpulkan " + TRK_NEED + " sampel GPS…", "wait");
+  renderTkk();
+}
+function tkkUndoTitik() {
+  if (st.tkk.mode === "manual") { st.tkk.man.pop(); if (!st.tkk.man.length) st.tkk.man.push({ lat: "", lon: "" }); }
+  else st.tkk.gpsPts.pop();
+  renderTkk(); renderHasil(); renderPills(); renderProg();
+}
+function tkkResetTitik() {
+  if (st.tkk.mode === "manual") st.tkk.man = [{ lat: "", lon: "" }];
+  else st.tkk.gpsPts = [];
+  renderTkk(); renderHasil(); renderPills(); renderProg();
+  tkkStatus("Titik mode ini direset", "bad");
+}
+function tkkHapusTitik(i) {
+  if (st.tkk.mode === "manual") st.tkk.man.splice(i, 1);
+  else st.tkk.gpsPts.splice(i, 1);
+  renderTkk(); renderHasil(); renderPills(); renderProg();
+}
+function tkkTambahTitik() {
+  st.tkk.man.push({ lat: "", lon: "" });
+  renderTkk();
+  var f = $("tkkRows").querySelector(".tkk-rowgrid:last-child .tkk-inp");
+  if (f) f.focus();
+}
+function tkkSetMan(i, f, v) { st.tkk.man[i][f] = v; tkkUpdate(); }
+function tkkPasteBulk() {
+  var lines = $("tkkPaste").value.split(/\r?\n/), out = [];
+  for (var i = 0; i < lines.length; i++) {
+    var p = lines[i].trim().split(/[\t,;\s]+/);
+    var q = [];
+    for (var j = 0; j < p.length; j++) if (p[j]) q.push(p[j]);
+    if (q.length < 2) continue;
+    var la = tkkNum(q[0]), lo = tkkNum(q[1]);
+    if (la === null || lo === null || Math.abs(la) > 90 || Math.abs(lo) > 180) continue;
+    out.push({ lat: String(la), lon: String(lo) });
+  }
+  if (!out.length) { tkkStatus("Format tempelan tidak terbaca", "bad"); return; }
+  st.tkk.man = out;
+  renderTkk(); renderHasil(); renderPills(); renderProg();
+  tkkStatus(out.length + " titik dimuat dari tempelan", "on");
+}
+function setTkkTh(v) {
+  st.tkk.th = +v;
+  var el = $("tkkThV"); if (el) el.textContent = v;
+  renderTkk();
+}
+function tkkStop(silent) {
+  var t = st.tkk;
+  tkkWatchOff();
+  t.gps = "off"; t.live = null; t.avg = null; t.samples = [];
+  renderTkk();
+  if (!silent) tkkStatus("GPS dihentikan", "bad");
+}
+function tkkGoBtn() { if (st.tkk.gps === "off") tkkStart(); else tkkStop(); }
+function tkkDraw() {
+  var svg = $("tkkMap"); if (!svg) return;
+  var t = st.tkk, NSV = 'vector-effect="non-scaling-stroke"';
+  var V = tkkVertices();
+  var o = V.length ? { lat: V[0].lat, lon: V[0].lon } : (t.origin || { lat: -6.2088, lon: 106.8456 });
+  var P = [], i;
+  for (i = 0; i < V.length; i++) P.push(tkkLL2XY(V[i].lat, V[i].lon, o));
+  var live = (t.mode === "gps" && t.live) ? tkkLL2XY(t.live.lat, t.live.lng, o) : null;
+  var all = P.slice(); if (live) all.push(live);
+  var h = "";
+  if (all.length) {
+    var xs = all.map(function (p) { return p.x; }), ys = all.map(function (p) { return p.y; });
+    var x0 = Math.min.apply(0, xs), x1 = Math.max.apply(0, xs), y0 = Math.min.apply(0, ys), y1 = Math.max.apply(0, ys);
+    var pad = Math.max(15, (x1 - x0 + y1 - y0) / 6), w = x1 - x0 + 2 * pad, hh = y1 - y0 + 2 * pad, R = 1.375;
+    if (w / hh > R) hh = w / R; else w = hh * R;
+    var vb = { x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - hh / 2, w: w, h: hh };
+    var k = vb.w / 110;
+    var pts = P.map(function (p) { return p.x + "," + p.y; }).join(" ");
+    if (P.length >= 3) h += '<polygon points="' + pts + '" fill="rgba(2,132,199,.18)" stroke="#0284c7" stroke-width="2.5" stroke-linejoin="round" ' + NSV + '/>';
+    else if (P.length === 2) h += '<line x1="' + P[0].x + '" y1="' + P[0].y + '" x2="' + P[1].x + '" y2="' + P[1].y + '" stroke="#0284c7" stroke-width="2.5" ' + NSV + '/>';
+    var last = P[P.length - 1];
+    if (last && live) h += '<line x1="' + last.x + '" y1="' + last.y + '" x2="' + live.x + '" y2="' + live.y + '" stroke="#0284c7" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="3 4" ' + NSV + '/>';
+    for (i = 0; i < P.length; i++) {
+      h += '<circle cx="' + P[i].x + '" cy="' + P[i].y + '" r="' + (2.1 * k) + '" fill="#fff" stroke="#0369a1" stroke-width="' + (.9 * k) + '"/>' +
+           '<text x="' + P[i].x + '" y="' + (P[i].y + 1.15 * k) + '" font-size="' + (3 * k) + '" font-weight="700" text-anchor="middle" fill="#0369a1">' + (i + 1) + '</text>';
+    }
+    if (live) {
+      var ok = t.live.acc <= t.th, c = ok ? "#10b981" : "#f87171", rr = Math.min(t.live.acc, vb.w * .4);
+      h += '<circle cx="' + live.x + '" cy="' + live.y + '" r="' + rr + '" fill="' + c + '" fill-opacity=".13" stroke="' + c + '" stroke-opacity=".55" ' + NSV + '/>' +
+           '<circle class="trk-pulse" cx="' + live.x + '" cy="' + live.y + '" r="' + (2 * k) + '" fill="' + c + '"/>' +
+           '<circle cx="' + live.x + '" cy="' + live.y + '" r="' + (1.7 * k) + '" fill="' + c + '" stroke="#fff" stroke-width="' + (.6 * k) + '"/>';
+    }
+    svg.setAttribute("viewBox", vb.x + " " + vb.y + " " + vb.w + " " + vb.h);
+  } else {
+    svg.setAttribute("viewBox", "0 0 110 80");
+  }
+  svg.innerHTML = h;
+  var warn = $("tkkWarn");
+  if (warn) warn.className = "tkk-warn" + (P.length >= 4 && tkkSelfX(P) ? " show" : "");
+}
+function tkkUpdate() {
+  tkkDraw();
+  var V = tkkVertices();
+  var xy = V.length ? tkkXY(V) : [];
+  var A = V.length >= 3 ? trkShoelace(xy) : 0;
+  $("tkkStatN").textContent = V.length;
+  $("tkkStatP").textContent = V.length >= 3 ? fmtNum(trkPerim(xy), 0) + " m" : "—";
+  var accTxt = "—";
+  if (V.length && st.tkk.mode === "gps") {
+    var s = 0;
+    for (var i = 0; i < V.length; i++) s += (V[i].acc || 0);
+    accTxt = "±" + fmtNum(s / V.length, 1) + " m";
+  }
+  $("tkkStatA").textContent = accTxt;
+  $("tkkStatL").textContent = V.length >= 3 ? fmtNum(A, 0) : "—";
+  var dis = V.length < 3;
+  $("tkkExpKml").disabled = dis;
+  $("tkkExpCsv").disabled = dis;
+  $("tkkExpGeo").disabled = dis;
+  renderHasil(); renderPills(); renderProg();
+}
+function renderTkk() {
+  var box = $("tkkBox"); if (!box) return;
+  var t = st.tkk, gps = t.mode === "gps";
+  $("tkkSegMan").className = gps ? "" : "on";
+  $("tkkSegGps").className = gps ? "on" : "";
+  $("tkkGpsUi").style.display = gps ? "block" : "none";
+  $("tkkManUi").style.display = gps ? "none" : "block";
+  $("tkkHint").textContent = gps
+    ? "Berdiri di tiap pojok batas genangan lalu tekan Ambil titik. Akurasi GPS HP biasanya ±3–8 m — gerbang mutu menyaring titik buruk."
+    : "Ketik Lintang & Bujur tiap pojok batas genangan secara berurutan (dari patok, peta, atau alat ukur). Minimal 3 titik.";
+  if (gps) {
+    var go = $("tkkGo");
+    go.textContent = t.gps === "off" ? "▶ Mulai GPS" : "■ Hentikan GPS";
+    go.className = "trk-btn trk-go" + (t.gps === "on" ? " rec" : "");
+    var fix = $("tkkFix");
+    fix.disabled = !t.live || !!t.avg;
+    $("tkkFixT").textContent = t.avg ? "Merata-ratakan " + t.avg.n + "/" + TRK_NEED + " sampel…" : "Ambil titik";
+    fix.style.setProperty("--p", t.avg ? t.avg.n / TRK_NEED : 0);
+    $("tkkUndo").disabled = !t.gpsPts.length;
+    $("tkkReset").disabled = !t.gpsPts.length;
+    var rows = "";
+    for (var i = 0; i < t.gpsPts.length; i++) {
+      var p = t.gpsPts[i];
+      rows += '<div class="trk-rowitem"><span>' + (i + 1) + '. <span class="co">' + p.lat.toFixed(6) + ", " + p.lon.toFixed(6) + '</span></span><span class="q">±' + fmtNum(p.acc, 1) + ' m <button class="tkk-del" onclick="tkkHapusTitik(' + i + ')">✕</button></span></div>';
+    }
+    $("tkkRows").innerHTML = rows;
+  } else {
+    var mrows = "";
+    for (var j = 0; j < t.man.length; j++) {
+      mrows += '<div class="tkk-rowgrid"><span class="tkk-no">' + (j + 1) + '</span>' +
+        '<input class="tkk-inp" inputmode="decimal" placeholder="Lintang" value="' + esc(t.man[j].lat) + '" oninput="tkkSetMan(' + j + ',\'lat\',this.value)">' +
+        '<input class="tkk-inp" inputmode="decimal" placeholder="Bujur" value="' + esc(t.man[j].lon) + '" oninput="tkkSetMan(' + j + ',\'lon\',this.value)">' +
+        '<button class="tkk-del" title="Hapus titik" onclick="tkkHapusTitik(' + j + ')">✕</button></div>';
+    }
+    $("tkkRows").innerHTML = mrows;
+  }
+  tkkUpdate();
+}
+function tkkSkeleton() {
+  return '<div class="trk-box" id="tkkBox">' +
+    '<div class="trk-head"><b>2. TITIK KOORDINAT — pojok batas genangan</b>' +
+      '<span class="trk-status" id="tkkStatus">GPS mati</span></div>' +
+    '<div class="tkk-seg"><button id="tkkSegMan" class="on" onclick="tkkSetMode(\'manual\')">Input manual</button>' +
+      '<button id="tkkSegGps" onclick="tkkSetMode(\'gps\')">GPS HP</button></div>' +
+    '<div class="trk-empty" id="tkkHint" style="padding:10px 6px"></div>' +
+    '<div class="trk-map"><svg id="tkkMap" viewBox="0 0 110 80" preserveAspectRatio="xMidYMid meet"></svg></div>' +
+    '<div id="tkkGpsUi">' +
+      '<div class="trk-row">' +
+        '<button class="trk-btn trk-go" id="tkkGo" onclick="tkkGoBtn()">▶ Mulai GPS</button>' +
+        '<button class="trk-btn trk-ic" id="tkkUndo" title="Batalkan titik terakhir" onclick="tkkUndoTitik()">↩</button>' +
+        '<button class="trk-btn trk-ic del" id="tkkReset" title="Reset titik" onclick="tkkResetTitik()">✕</button>' +
+      '</div>' +
+      '<button class="trk-btn trk-vtx" id="tkkFix" onclick="tkkAmbilTitik()" disabled><i></i><span id="tkkFixT">Ambil titik</span></button>' +
+      '<div class="trk-opt" style="margin-top:8px"><b>Gerbang mutu — ambang akurasi</b>Titik ditolak otomatis bila akurasinya lebih buruk dari ±<span id="tkkThV">' + st.tkk.th + '</span> m. GPS HP biasanya ±3–8 m.<input type="range" min="2" max="15" step="1" value="' + st.tkk.th + '" oninput="setTkkTh(this.value)"></div>' +
+    '</div>' +
+    '<div id="tkkManUi">' +
+      '<div class="trk-row">' +
+        '<button class="trk-btn trk-go" onclick="tkkTambahTitik()">＋ Titik</button>' +
+        '<button class="trk-btn trk-ic" title="Batalkan titik terakhir" onclick="tkkUndoTitik()">↩</button>' +
+        '<button class="trk-btn trk-ic del" title="Reset titik" onclick="tkkResetTitik()">✕</button>' +
+      '</div>' +
+      '<details style="margin-top:8px"><summary style="font-size:11px;font-weight:800;color:#0369a1;cursor:pointer">Tempel massal dari Excel (Lintang, Bujur per baris)</summary>' +
+        '<textarea id="tkkPaste" rows="3" placeholder="-6.208800, 106.845600&#10;-6.209100, 106.846900&#10;-6.210300, 106.845100" style="width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:8px;font-size:11px;font-family:ui-monospace,Menlo,monospace;margin-top:6px"></textarea>' +
+        '<button class="trk-btn trk-auto" style="margin-top:6px" onclick="tkkPasteBulk()">Tempel ke daftar titik</button>' +
+      '</details>' +
+    '</div>' +
+    '<div class="trk-stats">' +
+      '<div><div class="k">Titik valid</div><div class="v" id="tkkStatN">0</div><div class="u">titik</div></div>' +
+      '<div><div class="k">Keliling</div><div class="v" id="tkkStatP">—</div><div class="u">meter</div></div>' +
+      '<div><div class="k">Akurasi rata²</div><div class="v" id="tkkStatA">—</div><div class="u">meter</div></div>' +
+      '<div><div class="k">Luas poligon</div><div class="v" id="tkkStatL">—</div><div class="u">m²</div></div>' +
+    '</div>' +
+    '<div class="trk-listhead"><span>Daftar titik pojok</span><span class="tkk-eks">' +
+      '<button class="trk-chip" id="tkkExpKml" onclick="tkkExpKml()" disabled>KML</button>' +
+      '<button class="trk-chip" id="tkkExpCsv" onclick="tkkExpCsv()" disabled>CSV</button>' +
+      '<button class="trk-chip" id="tkkExpGeo" onclick="tkkExpGeo()" disabled>GeoJSON</button></span></div>' +
+    '<div id="tkkRows"></div>' +
+    '<div class="tkk-warn" id="tkkWarn">⚠ Sisi poligon saling berpotongan — urutan titik kemungkinan keliru, luas tidak valid. Susun ulang titiknya.</div>' +
+    '<div class="trk-note">"Ekspor &amp; simpan" (KML/CSV/GeoJSON) bersifat <b>kondisional</b> dan hasilnya <b>tidak terekam</b> dalam 5 folder output proyek (01–05).</div>' +
+  '</div>';
+}
+/* Kondisional: "Ekspor dan simpan" — DI LUAR output 5 folder proyek */
+function tkkRing() {
+  var V = tkkVertices();
+  var c = V.map(function (p) { return [p.lon, p.lat]; });
+  c.push(c[0]);
+  return { V: V, ring: c };
+}
+function tkkUnduh(nama, isi, mime) {
+  try {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([isi], { type: mime }));
+    a.download = nama;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    tkkStatus("Berkas " + nama + " diunduh (kondisional — tidak terekam di 5 folder output)", "sim");
+  } catch (e) { tkkStatus("Unduhan diblokir di tampilan ini", "bad"); }
+}
+function tkkExpKml() {
+  var r = tkkRing(); if (r.V.length < 3) return;
+  var co = r.ring.map(function (g) { return g[0].toFixed(7) + "," + g[1].toFixed(7) + ",0"; }).join(" ");
+  var k = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Luasan Genangan - Titik Koordinat</name>' +
+    '<Placemark><name>Poligon Titik Koordinat</name><ExtendedData><Data name="luas_m2"><value>' + trkShoelace(tkkXY(r.V)).toFixed(2) + '</value></Data></ExtendedData>' +
+    '<Polygon><outerBoundaryIs><LinearRing><coordinates>' + co + '</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Document></kml>';
+  tkkUnduh("luasan-genangan-titik-koordinat.kml", k, "application/vnd.google-earth.kml+xml");
+}
+function tkkExpCsv() {
+  var r = tkkRing(); if (r.V.length < 3) return;
+  var gps = st.tkk.mode === "gps", rows = ["No,Bujur,Lintang" + (gps ? ",Akurasi_m" : "")];
+  for (var i = 0; i < r.V.length; i++) rows.push((i + 1) + "," + r.V[i].lon + "," + r.V[i].lat + (gps ? "," + r.V[i].acc.toFixed(2) : ""));
+  rows.push("", "Luas_m2," + trkShoelace(tkkXY(r.V)).toFixed(2), "Keliling_m," + trkPerim(tkkXY(r.V)).toFixed(2));
+  tkkUnduh("luasan-genangan-titik-koordinat.csv", rows.join("\n"), "text/csv");
+}
+function tkkExpGeo() {
+  var r = tkkRing(); if (r.V.length < 3) return;
+  var gj = { type: "Feature", properties: { area_m2: Number(trkShoelace(tkkXY(r.V)).toFixed(2)), n_points: r.V.length }, geometry: { type: "Polygon", coordinates: [r.ring] } };
+  tkkUnduh("luasan-genangan-titik-koordinat.geojson", JSON.stringify(gj, null, 2), "application/geo+json");
+}
+
+/* ===== ALUR LOGIKA 3: AI — estimasi luas genangan dari analisis multi-foto =====
+   Diadaptasi dari contoh "LUAS AI FOTO V1.0" pengguna (metodologi, bukan mentah):
+   - surveyor memotret genangan dari posisi bebas, overlap 40–60%, mistar kalibrasi
+     terlihat di tiap foto & dipindah mengikuti pengambilan;
+   - pipeline: M1 PHOTO_CAPTURE → M2 PHOTO_QUALITY (ketajaman/cahaya) →
+     M3 REFERENCE_ROD (mistar → skala mm/px) → M4 IMAGE_STITCHING (mosaik) →
+     M5 WATER_SEGMENTATION (mask genangan, CV klasik offline) →
+     M6 AREA_CALCULATION (luas + ketidakpastian) → M7 VALIDATION (gerbang G1–G8);
+   - status kualitas: LAYAK / PERLU VERIFIKASI / GAGAL; hasil luas jadi LUAS proyek;
+   - foto analisa AI disimpan di folder TERSSENDIRI (AI_FOTO_ANALISA) DI LUAR 5 folder
+     output (01–05); "Ekspor Log JSON" KONDISIONAL dan tidak terekam di output proyek.
+   Pada versi HTML ini pipeline berjalan dalam MODE SIMULASI (mesin CV final menyusul). */
+function aiLogReset() {
+  st.ai.log = [];
+  var el = $("aiLog"); if (el) el.textContent = "Menunggu input...";
+}
+function aiLog(m) {
+  st.ai.log.push("[" + new Date().toLocaleTimeString("id-ID") + "] " + m);
+  var el = $("aiLog");
+  if (el) { el.textContent = st.ai.log.slice(-40).join("\n"); el.scrollTop = el.scrollHeight; }
+}
+function aiFilePilih(inp) {
+  var files = inp.files;
+  if (!files || !files.length) return;
+  var n = Math.min(files.length, 8 - st.ai.fotos.length), selesai = 0;
+  if (n <= 0) return;
+  for (var i = 0; i < n; i++) {
+    (function (f) {
+      var rd = new FileReader();
+      rd.onload = function () {
+        st.ai.fotos.push({ dataURL: rd.result });
+        selesai++;
+        if (selesai >= n) renderAi();
+      };
+      rd.readAsDataURL(f);
+    })(files[i]);
+  }
+  inp.value = "";
+}
+function aiHapusFoto(i) { st.ai.fotos.splice(i, 1); renderAi(); }
+function aiHapusSemua() { st.ai.fotos = []; st.ai.hasil = null; aiLogReset(); renderAi(); renderHasil(); renderPills(); renderProg(); }
+function aiContohURL(warna, n) {
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#94a3b8"/><ellipse cx="50" cy="62" rx="42" ry="26" fill="' + warna + '"/><rect x="8" y="40" width="56" height="5" rx="2" fill="#1f2937"/><text x="10" y="36" font-size="9" fill="#1f2937">FOTO ' + n + '</text></svg>';
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+function aiMuatContoh() {
+  st.ai.fotos = [];
+  var warna = ["#1f6feb", "#3b82f6", "#60a5fa"];
+  for (var i = 0; i < 3 && st.ai.fotos.length < 8; i++) st.ai.fotos.push({ dataURL: aiContohURL(warna[i], i + 1) });
+  renderAi();
+  aiLog("3 foto contoh (simulasi) dimuat — siap diproses");
+}
+function aiSetRod(v) { st.ai.rodMm = +v; }
+function aiSetRes(v) { st.ai.res = +v; }
+function aiProses() {
+  var t = st.ai;
+  if (t.proses || t.fotos.length < 2) return;
+  t.proses = true; t.hasil = null;
+  renderAi();
+  aiLogReset();
+  var n = t.fotos.length;
+  /* MODE SIMULASI: nilai pipeline digenerasi wajar; mesin CV final menyusul */
+  var overlap = Math.round(30 + Math.random() * 35);
+  var mutuOk = Math.random() > .18;
+  var rodOk = Math.random() > .15;
+  var konsist = +(2 + Math.random() * 12).toFixed(1);
+  var maskPct = Math.round(6 + Math.random() * 60);
+  var luas = Math.round(600 + Math.random() * 7400);
+  var unc = +(8 + Math.random() * 14).toFixed(1);
+  var skala = +(t.rodMm / (380 + Math.random() * 140)).toFixed(2);
+  var gates = [
+    { n: "G1 · Jumlah foto ≥ 2", v: "OK", s: "ok" },
+    { n: "G2 · Overlap antar foto 40–60%", v: overlap + "%", s: (overlap >= 40 && overlap <= 60) ? "ok" : (overlap >= 30 ? "warn" : "bad") },
+    { n: "G3 · Mutu foto (ketajaman & cahaya)", v: mutuOk ? "OK" : "BURAM/CAHAYA", s: mutuOk ? "ok" : "warn" },
+    { n: "G4 · Mistar kalibrasi terdeteksi", v: rodOk ? "OK" : "TIDAK TERDETEKSI", s: rodOk ? "ok" : "bad" },
+    { n: "G5 · Konsistensi skala ≤ ±10%", v: "±" + konsist + "%", s: konsist <= 10 ? "ok" : (konsist <= 15 ? "warn" : "bad") },
+    { n: "G6 · Proporsi mask genangan 5–90%", v: maskPct + "%", s: (maskPct >= 5 && maskPct <= 90) ? "ok" : "warn" },
+    { n: "G7 · Luas hasil wajar (> 0)", v: luas + " m²", s: luas > 0 ? "ok" : "bad" },
+    { n: "G8 · Ketidakpastian ≤ ±20%", v: "±" + unc + "%", s: unc <= 20 ? "ok" : "bad" }
+  ];
+  var gagal = false, perlu = false;
+  for (var i = 0; i < gates.length; i++) {
+    if (gates[i].s === "bad") gagal = true;
+    else if (gates[i].s === "warn") perlu = true;
+  }
+  var status = gagal ? "GAGAL" : (perlu ? "PERLU" : "LAYAK");
+  var langkah = [
+    "Memulai pipeline analisis — " + n + " foto, resolusi kerja " + t.res + " px, mistar " + (t.rodMm / 1000) + " m",
+    "M1 PHOTO_CAPTURE: " + n + " foto diterima",
+    "M2 PHOTO_QUALITY: " + (mutuOk ? "semua foto lolos (ketajaman & cahaya)" : "ada foto bermasalah (BURAM/CAHAYA)"),
+    "M3 REFERENCE_ROD: " + (rodOk ? "mistar terdeteksi di semua foto — skala " + skala + " mm/px" : "mistar tidak terdeteksi di salah satu foto"),
+    "M4 IMAGE_STITCHING: mosaik tersusun, overlap ~" + overlap + "%",
+    "M5 WATER_SEGMENTATION: mask genangan ≈ " + maskPct + "% dari mosaik (CV klasik offline)",
+    "M6 AREA_CALCULATION: luas ≈ " + luas + " m² (±" + unc + "%)",
+    "M7 VALIDATION: gerbang G1–G8 → status " + status
+  ];
+  var ix = 0;
+  var tm = setInterval(function () {
+    if (ix >= langkah.length) {
+      clearInterval(tm);
+      t.proses = false;
+      t.hasil = {
+        luas: gagal ? null : luas, unc: unc, status: status,
+        keliling: Math.round(Math.sqrt(luas) * 3.6), skala: skala, konsist: konsist,
+        maskPct: maskPct, overlap: overlap, gates: gates
+      };
+      aiLog("Selesai — status: " + status + (gagal ? " (luas tidak divalidasi — perbaiki input lalu proses ulang)" : " (estimasi luas masuk ke panel hasil Luas)"));
+      renderAi(); renderHasil(); renderPills(); renderProg();
+      return;
+    }
+    aiLog(langkah[ix]); ix++;
+  }, 550);
+}
+function aiEksporLog() {
+  var t = st.ai;
+  if (!t.hasil) return;
+  var d = { waktu: new Date().toISOString(), jumlah_foto: t.fotos.length, mistar_mm: t.rodMm, resolusi_kerja_px: t.res, log: t.log, hasil: t.hasil };
+  try {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 2)], { type: "application/json" }));
+    a.download = "log-analisis-ai-genangan.json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  } catch (e) {}
+}
+function renderAi() {
+  var box = $("aiBox"); if (!box) return;
+  var t = st.ai;
+  var th = "";
+  for (var i = 0; i < t.fotos.length; i++) {
+    th += '<div class="ai-thumb"><img src="' + t.fotos[i].dataURL + '" alt="">' +
+      '<span class="num">' + (i + 1) + '</span>' +
+      '<button class="del" title="Hapus foto" onclick="aiHapusFoto(' + i + ')">✕</button></div>';
+  }
+  $("aiThumbs").innerHTML = th;
+  $("aiCount").textContent = t.fotos.length + " foto" + (t.fotos.length < 2 ? " — minimal 2 foto dengan overlap 40–60%" : "");
+  $("aiGo").disabled = t.proses || t.fotos.length < 2;
+  $("aiGo").textContent = t.proses ? "⏳ Memproses…" : "⚙ Proses Otomatis";
+  $("aiHapus").disabled = !t.fotos.length;
+  var res = $("aiRes");
+  if (t.hasil) {
+    var h = t.hasil;
+    var gl = "";
+    for (var g = 0; g < h.gates.length; g++) gl += '<div class="g"><span>' + h.gates[g].n + '</span><span class="gv ' + h.gates[g].s + '">' + h.gates[g].v + '</span></div>';
+    res.className = "ai-res show";
+    res.innerHTML = '<div class="lbl">Estimasi Luas Genangan</div>' +
+      (h.luas !== null ? '<div class="big">' + fmtNum(h.luas, 0) + ' <small>m²</small></div>' : '<div class="big">—</div>') +
+      '<div class="unc">ketidakpastian ±' + h.unc + '% · keliling ≈ ' + fmtNum(h.keliling, 0) + ' m · skala ' + h.skala + ' mm/px · konsistensi ±' + h.konsist + '% · mask ' + h.maskPct + '%</div>' +
+      '<span class="ai-pill ' + h.status + '">' + (h.status === "LAYAK" ? "LAYAK" : (h.status === "PERLU" ? "PERLU VERIFIKASI" : "GAGAL")) + '</span>' +
+      '<div class="ai-gates">' + gl + '</div>';
+    $("aiExpLog").disabled = false;
+  } else {
+    res.className = "ai-res";
+    res.innerHTML = "";
+    $("aiExpLog").disabled = true;
+  }
+}
+function aiSkeleton() {
+  return '<div class="trk-box" id="aiBox">' +
+    '<div class="trk-head"><b>3. AI — foto genangan</b><span class="trk-status sim">OFFLINE · CV KLASIK</span></div>' +
+    '<div class="trk-empty" style="display:block;padding:10px 6px">Ambil beberapa foto dari posisi bebas — tumpang tindih 40–60% dan mistar kalibrasi terlihat di setiap foto. Pindahkan mistar mengikuti pengambilan.</div>' +
+    '<input type="file" id="aiFile" accept="image/*" multiple style="display:none" onchange="aiFilePilih(this)">' +
+    '<div class="ai-btns">' +
+      '<button class="trk-btn trk-go" onclick="$(\'aiFile\').click()">📷 Tambah Foto</button>' +
+      '<button class="trk-btn trk-auto" onclick="aiMuatContoh()">Muat contoh</button>' +
+      '<button class="trk-btn trk-ic del" id="aiHapus" title="Hapus semua foto" onclick="aiHapusSemua()">🗑</button>' +
+    '</div>' +
+    '<div class="ai-thumbs" id="aiThumbs"></div>' +
+    '<div class="trk-note" id="aiCount">0 foto — minimal 2 foto dengan overlap 40–60%</div>' +
+    '<div class="ai-set">' +
+      '<select onchange="aiSetRod(this.value)" aria-label="Panjang mistar fisik"><option value="1000">Mistar 1 m (1000 mm)</option><option value="2000">Mistar 2 m (2000 mm)</option><option value="3000" selected>Mistar 3 m (3000 mm)</option></select>' +
+      '<select onchange="aiSetRes(this.value)" aria-label="Resolusi kerja"><option value="1200">1200 px (hemat)</option><option value="1600" selected>1600 px (seimbang)</option><option value="2000">2000 px (detail)</option></select>' +
+    '</div>' +
+    '<div class="ai-warn">⚠ Deteksi genangan memakai ciri warna/kejenuhan/kecerahan (CV klasik), bukan model deep learning. Hasil adalah estimasi dan selalu ditandai status kualitas. Analisis foto berjalan dalam MODE SIMULASI di halaman ini — mesin CV final menyusul di aplikasi.</div>' +
+    '<button class="trk-btn trk-vtx" id="aiGo" onclick="aiProses()" disabled><span>⚙ Proses Otomatis</span></button>' +
+    '<div class="ai-log" id="aiLog">Menunggu input...</div>' +
+    '<div class="ai-res" id="aiRes"></div>' +
+    '<div class="trk-listhead"><span>Log &amp; hasil diagnostik</span><button class="trk-chip" id="aiExpLog" onclick="aiEksporLog()" disabled>Ekspor Log JSON</button></div>' +
+    '<div class="trk-note">"Ekspor Log JSON" bersifat <b>kondisional</b> dan tidak terekam dalam 5 folder output. Foto untuk analisa AI disimpan di <b>folder penyimpanan tersendiri (AI_FOTO_ANALISA)</b> — <b>di luar</b> 5 folder output proyek (01–05).</div>' +
+  '</div>';
+}
+
+function setMetode(m) {
+  if (m === "manual") { trkStop(true); tkkStop(true); } // kembali ke manual → matikan semua GPS otomatis
+  st.metode = m; renderAll();
+}
+
+/* --- efek kedip hasil: aktif saat pensil/tong sampah diklik, berhenti lalu memudar --- */
+var blinkAktif = false;
+var fadeAktif = false;
+var timerFade = null;
+
+function mulaiBlink() {
+  blinkAktif = true;
+  fadeAktif = false;
+  if (timerFade) { clearTimeout(timerFade); timerFade = null; }
+  renderHasil();
+}
+function stopBlinkFade() {
+  if (!blinkAktif) return;
+  blinkAktif = false;
+  fadeAktif = true;
+  renderHasil();
+  if (timerFade) clearTimeout(timerFade);
+  timerFade = setTimeout(function () {
+    fadeAktif = false;
+    timerFade = null;
+    renderHasil();
+  }, 950);
+}
+
+function tambahKedalaman() {
+  st.kedalaman.push({ id: st.nextId++, nilai: "", edit: true });
+  renderKedalaman(); renderPills(); renderProg();
+}
+function editKedalaman(id) {
+  for (var i = 0; i < st.kedalaman.length; i++)
+    if (st.kedalaman[i].id === id) st.kedalaman[i].edit = true;
+  renderKedalaman();
+  mulaiBlink(); // angka hasil mulai berkedip saat pensil diklik
+}
+function commitKedalaman(id) {
+  for (var i = 0; i < st.kedalaman.length; i++)
+    if (st.kedalaman[i].id === id) st.kedalaman[i].edit = false;
+  renderKedalaman(); renderPills(); renderProg();
+  stopBlinkFade(); // edit selesai: kedip berhenti, lalu memudar
+}
+function hapusKedalaman(id) {
+  var out = [];
+  for (var i = 0; i < st.kedalaman.length; i++)
+    if (st.kedalaman[i].id !== id) out.push(st.kedalaman[i]);
+  st.kedalaman = out;
+  renderKedalaman(); renderPills(); renderProg();
+  mulaiBlink(); // angka hasil berkedip saat tong sampah diklik ...
+  if (timerFade) clearTimeout(timerFade);
+  timerFade = setTimeout(stopBlinkFade, 900); // ... lalu berhenti & memudar
+}
+function setKedalamanNilai(id, val) {
+  for (var i = 0; i < st.kedalaman.length; i++)
+    if (st.kedalaman[i].id === id) st.kedalaman[i].nilai = val;
+  renderHasil(); renderPills(); renderProg();
+}
+/* ===== Item PANJANG / LEBAR dengan ikon pensil & tong sampah (perilaku sama seperti Kedalaman) ===== */
+function ukurItemInner(key) {
+  var judul = key === "panjang" ? "PANJANG (MM)" : "LEBAR (MM)";
+  var nilai = key === "panjang" ? st.panjang : st.lebar;
+  var edit = key === "panjang" ? st.panjangEdit : st.lebarEdit;
+  var contoh = key === "panjang" ? "mis. 12000" : "mis. 8000";
+  var v = angka(nilai);
+  var body;
+  if (edit) {
+    body = '<input class="inp" id="inp_' + key + '" type="text" inputmode="decimal" placeholder="' + contoh + ' (mm)" value="' + esc(nilai) + '"' +
+      ' oninput="setUkur(\'' + key + '\', this.value)"' +
+      ' onblur="commitUkur(\'' + key + '\')"' +
+      ' onkeydown="if(event.key===\'Enter\')this.blur()">';
+  } else {
+    body = '<div class="depth-val">' + (v !== null ? fmtNum(v, 0) + " mm" : '<span class="muted">belum diisi — tap pensil untuk edit</span>') + '</div>';
+  }
+  return '<div class="depth-head"><span class="depth-title">' + judul + '</span>' +
+    '<span class="depth-tools">' +
+      '<button class="tool tool-edit' + (edit ? " idle-cursor" : "") + '" title="Edit angka input" onclick="editUkur(\'' + key + '\')">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>' +
+      '<button class="tool tool-hapus" title="Hapus isian" onclick="hapusUkur(\'' + key + '\')">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+    '</span></div>' + body;
+}
+function renderUkurItem(key) { var el = $("item_" + key); if (el) el.innerHTML = ukurItemInner(key); }
+function setUkur(key, v) {
+  if (key === "panjang") st.panjang = v; else st.lebar = v;
+  renderHasil(); renderPills(); renderProg(); renderManualNote();
+}
+function editUkur(key) {
+  if (key === "panjang") st.panjangEdit = true; else st.lebarEdit = true;
+  renderUkurItem(key);
+  var el = $("inp_" + key); if (el) el.focus();
+  mulaiBlink();
+}
+function commitUkur(key) {
+  if (key === "panjang") st.panjangEdit = false; else st.lebarEdit = false;
+  renderUkurItem(key);
+  stopBlinkFade();
+}
+function hapusUkur(key) {
+  if (key === "panjang") { st.panjang = ""; st.panjangEdit = false; }
+  else { st.lebar = ""; st.lebarEdit = false; }
+  renderUkurItem(key);
+  renderHasil(); renderPills(); renderProg(); renderManualNote();
+  mulaiBlink();
+  if (timerFade) clearTimeout(timerFade);
+  timerFade = setTimeout(stopBlinkFade, 900);
+}
+
+/* ===== Pilihan bentuk mode MANUAL: 2–6 polyline (persegi panjang s.d. segi enam) =====
+   Genangan di lapangan jarang berbentuk persegi panjang — surveyor memilih bentuk
+   yang paling mendekati, lalu mengisi panjang sisi (mm) per kolom polyline.
+   Rumus: 1) p×l  2) Heron (3 sisi)  3) Brahmagupta (4 sisi)  4/5) pendekatan
+   poligon beraturan dengan sisi rata-rata. Ikon pensil/tong sampah + blink/fade
+   perilakunya sama seperti item kedalaman. */
+var BENTUK = [
+  { key: 1, label: "Persegi Panjang", poly: 2,
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="1"/></svg>' },
+  { key: 2, label: "Segi Tiga", poly: 3,
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 4l9 16H3z"/></svg>' },
+  { key: 3, label: "Segi Empat", poly: 4,
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6.5 5h11l4 14h-19z"/></svg>' },
+  { key: 4, label: "Segi Lima", poly: 5,
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2.5l9.6 7-3.7 11.3H6.1L2.4 9.5z"/></svg>' },
+  { key: 5, label: "Segi Enam", poly: 6,
+    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l8.7 5v10L12 22l-8.7-5V7z"/></svg>' }
+];
+function bentukKartu(b) {
+  var on = st.bentuk === b.key ? " on" : "";
+  return '<div class="kartu-opsi' + on + '" onclick="setBentuk(' + b.key + ')" title="' + b.label + '">' +
+    '<span class="no">' + b.poly + '</span>' + b.svg +
+    '<span class="nama">' + b.label + '</span>' +
+    '<span class="cek">✓</span></div>';
+}
+function setBentuk(k) {
+  st.bentuk = k;
+  renderBlokManual();
+  renderHasil(); renderPills(); renderProg();
+}
+function manualItemsInner() {
+  var h = "";
+  if (st.bentuk === 1) {
+    h += '<div class="depth-item" id="item_panjang">' + ukurItemInner("panjang") + '</div>' +
+         '<div class="depth-item" id="item_lebar">' + ukurItemInner("lebar") + '</div>';
+  } else {
+    var n = st.bentuk + 1;
+    for (var i = 0; i < n; i++) h += '<div class="depth-item" id="item_sisi_' + i + '">' + sisiItemInner(i) + '</div>';
+  }
+  return h;
+}
+function sisiItemInner(i) {
+  var nilai = st.sisi[i], edit = st.sisiEdit[i];
+  var v = angka(nilai);
+  var body;
+  if (edit) {
+    body = '<input class="inp" id="inp_sisi_' + i + '" type="text" inputmode="decimal" placeholder="mis. 12000 (mm)" value="' + esc(nilai) + '"' +
+      ' oninput="setSisi(' + i + ', this.value)"' +
+      ' onblur="commitSisi(' + i + ')"' +
+      ' onkeydown="if(event.key===\'Enter\')this.blur()">';
+  } else {
+    body = '<div class="depth-val">' + (v !== null ? fmtNum(v, 0) + " mm" : '<span class="muted">belum diisi — tap pensil untuk edit</span>') + '</div>';
+  }
+  return '<div class="depth-head"><span class="depth-title">POLYLINE ' + (i + 1) + ' (MM)</span>' +
+    '<span class="depth-tools">' +
+      '<button class="tool tool-edit' + (edit ? " idle-cursor" : "") + '" title="Edit angka input" onclick="editSisi(' + i + ')">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>' +
+      '<button class="tool tool-hapus" title="Hapus isian" onclick="hapusSisi(' + i + ')">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+    '</span></div>' + body;
+}
+function renderSisi(i) { var el = $("item_sisi_" + i); if (el) el.innerHTML = sisiItemInner(i); }
+function setSisi(i, v) {
+  st.sisi[i] = v;
+  renderHasil(); renderPills(); renderProg(); renderManualNote();
+}
+function editSisi(i) {
+  st.sisiEdit[i] = true;
+  renderSisi(i);
+  var el = $("inp_sisi_" + i); if (el) el.focus();
+  mulaiBlink();
+}
+function commitSisi(i) {
+  st.sisiEdit[i] = false;
+  renderSisi(i);
+  stopBlinkFade();
+  renderManualNote();
+}
+function hapusSisi(i) {
+  st.sisi[i] = ""; st.sisiEdit[i] = false;
+  renderSisi(i);
+  renderHasil(); renderPills(); renderProg(); renderManualNote();
+  mulaiBlink();
+  if (timerFade) clearTimeout(timerFade);
+  timerFade = setTimeout(stopBlinkFade, 900);
+}
+function sisiPenuh() {
+  var n = st.bentuk + 1;
+  for (var i = 0; i < n; i++) {
+    var v = angka(st.sisi[i]);
+    if (v === null || v <= 0) return false;
+  }
+  return true;
+}
+function renderManualNote() {
+  var el = $("manualNote"); if (!el) return;
+  var txt = "", warn = false;
+  if (st.bentuk === 1) txt = "Rumus: Luas = Panjang × Lebar (persegi panjang).";
+  else if (st.bentuk === 2) {
+    txt = "Rumus: Heron — L = √(s(s−a)(s−b)(s−c)) dari 3 sisi.";
+    warn = sisiPenuh() && luasHitung() === null;
+  } else if (st.bentuk === 3) {
+    txt = "Rumus: Brahmagupta — 4 sisi (asumsi segi empat siklik, mendekati trapesium/jajar genjang).";
+    warn = sisiPenuh() && luasHitung() === null;
+  } else if (st.bentuk === 4) {
+    txt = "Pendekatan: segi lima (pentagon) beraturan dengan sisi rata-rata dari 5 sisi terukur.";
+  } else {
+    txt = "Pendekatan: segi enam (hexagon) beraturan dengan sisi rata-rata dari 6 sisi terukur.";
+  }
+  el.innerHTML = txt + (warn ? ' <b style="color:#dc2626">⚠ Sisi yang diisi belum membentuk poligon yang valid — periksa angkanya.</b>' : "");
+}
+
+/* ===== FOTO BUKTI — pengambilan nyata + stempel metadata (waktu & koordinat) =====
+   - Tap slot → buka kamera (input capture="environment"); jika kamera tidak tersedia
+     (halaman dibuka lokal), pemilih berkas galeri tetap bisa dipakai.
+   - Foto diproses di <canvas>: stempel dibakar permanen di kiri bawah gambar:
+     baris 1 = hari, tanggal bulan tahun · jam:menit (dari Langkah 1 "Waktu Survei";
+     bila belum diambil, dipakai waktu pengambilan foto), baris 2 = koordinat
+     dari Langkah 3 "Titik Genangan" (bila belum diambil: "KOORDINAT BELUM DIAMBIL"),
+     baris 3 = LOKASI SAYA (alamat berjenjang dari panel 3.1; hanya bila sudah diambil).
+   - Hasil JPG (dataURL) disimpan di state + diunduh saat Export (folder 02_FOTO_BUKTI). */
+var FOTO_MAX_W = 1600;
+var fotoSlotAktif = null;
+
+function fotoNamaFile(slot) {
+  var d = st.foto[slot] && st.foto[slot].waktu ? st.foto[slot].waktu : (st.waktu || new Date());
+  return "02_FOTO_BUKTI/foto_" + slot.toLowerCase().replace(/[^a-z0-9]+/g, "_") + "_" +
+    d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes()) + ".jpg";
+}
+function fmtWaktuStamp(d) {
+  return HARI[d.getDay()] + ", " + d.getDate() + " " + BULAN[d.getMonth()] + " " + d.getFullYear() +
+    " · " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+function fmtKoorStamp() {
+  if (!st.koordinat) return "KOORDINAT BELUM DIAMBIL";
+  return "LAT " + st.koordinat.lat.toFixed(5) + "  LON " + st.koordinat.lon.toFixed(5) +
+    (st.koordinat.akurasi ? "  (±" + st.koordinat.akurasi + " m)" : "");
+}
+function potongTeks(cx, teks, maks) { // jaga baris stempel tetap muat di lebar foto
+  if (cx.measureText(teks).width <= maks) return teks;
+  var n = teks.length;
+  while (n > 4 && cx.measureText(teks.slice(0, n) + "…").width > maks) n = Math.floor(n * .92);
+  return teks.slice(0, n) + "…";
+}
+function fotoWarn(msg) {
+  var el = $("fotoWarn");
+  if (!el) return;
+  if (msg) { el.textContent = msg; el.className = "foto-warn show"; }
+  else el.className = "foto-warn";
+}
+function bukaFoto(slot, ev) {
+  if (ev) ev.stopPropagation(); // cegah bubbling ke slot (fotoLihat) saat tombol "Ambil ulang" diketuk
+  fotoSlotAktif = slot;
+  var inp = $("fotoInput");
+  if (!inp) return;
+  inp.value = "";
+  inp.click();
+}
+function fotoProses(inp) {
+  var f = inp.files && inp.files[0];
+  if (!f || !fotoSlotAktif) return;
+  var slot = fotoSlotAktif;
+  fotoWarn("");
+  var slotEl = document.querySelector('.slot[data-slot="' + slot + '"] .load');
+  if (slotEl) slotEl.classList.add("on");
+  var rd = new FileReader();
+  rd.onload = function () {
+    var img = new Image();
+    img.onload = function () {
+      var sk = Math.min(1, FOTO_MAX_W / img.width);
+      var cv = document.createElement("canvas");
+      cv.width = Math.round(img.width * sk);
+      cv.height = Math.round(img.height * sk);
+      var cx = cv.getContext("2d");
+      cx.drawImage(img, 0, 0, cv.width, cv.height);
+      /* stempel metadata — kiri bawah, meniru cap kamera */
+      var waktuStamp = st.waktu || new Date();
+      var l1 = fmtWaktuStamp(waktuStamp);
+      var l2 = fmtKoorStamp();
+      var l3 = st.lokasi ? st.lokasi.teks : ""; // LOKASI SAYA → baris ke-3 stempel, tepat di bawah koordinat
+      var fs = Math.max(13, Math.round(cv.width / 32));
+      var lh = Math.round(fs * 1.3);
+      var padX = Math.round(fs * .7), padY = Math.round(fs * .5);
+      cx.font = "700 " + fs + "px 'Segoe UI', Arial, sans-serif";
+      var maksW = cv.width - padX * 2 - 4;
+      var baris = [potongTeks(cx, l1, maksW), potongTeks(cx, l2, maksW)];
+      if (l3) baris.push(potongTeks(cx, l3, maksW));
+      var boxW = 0;
+      for (var bi = 0; bi < baris.length; bi++) boxW = Math.max(boxW, cx.measureText(baris[bi]).width);
+      boxW += padX * 2;
+      var boxH = lh * baris.length + padY * 2;
+      var bx = 0, by = cv.height - boxH;
+      cx.fillStyle = "rgba(15,23,42,.72)";
+      cx.fillRect(bx, by, boxW, boxH);
+      cx.fillStyle = "#7dd3fc";
+      cx.fillRect(bx, by, 4, boxH);
+      cx.textBaseline = "top";
+      for (var li = 0; li < baris.length; li++) {
+        cx.fillStyle = li === 0 ? "#fff" : "#bae6fd";
+        cx.fillText(baris[li], padX, by + padY + li * lh);
+      }
+      st.foto[slot] = { dataURL: cv.toDataURL("image/jpeg", 0.9), waktu: new Date(waktuStamp.getTime()),
+                        lat: st.koordinat ? st.koordinat.lat : null, lon: st.koordinat ? st.koordinat.lon : null,
+                        lokasi: st.lokasi ? st.lokasi.teks : null,
+                        file: fotoNamaFile(slot) };
+      if (slotEl) slotEl.classList.remove("on");
+      var wmsg = "";
+      if (!st.waktu) wmsg = "⚠ Langkah 1 belum diambil — stempel memakai waktu pengambilan foto. Ambil \"Waktu Survei\" lalu foto ulang agar stempel sesuai survei.";
+      if (!st.koordinat) wmsg += (wmsg ? " " : "") + "⚠ Langkah 3 belum diambil — koordinat pada stempel ditandai BELUM DIAMBIL. Ambil koordinat lalu foto ulang.";
+      if (wmsg) fotoWarn(wmsg);
+      renderFoto(); renderProg();
+      img = null; cv = null;
+    };
+    img.onerror = function () { if (slotEl) slotEl.classList.remove("on"); fotoWarn("⚠ Berkas bukan gambar yang valid."); };
+    img.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+}
+function hapusFoto(slot, ev) {
+  if (ev) ev.stopPropagation();
+  delete st.foto[slot];
+  fotoWarn("");
+  renderFoto(); renderProg();
+}
+function fotoLihat(slot) {
+  var f = st.foto[slot];
+  if (!f) return;
+  var sheet = $("sheet");
+  $("ovl").className = "overlay on";
+  sheet.innerHTML = '<div class="sheet-head"><h2>Foto Bukti</h2>' +
+    '<button class="btn-tutup" onclick="tutupExport()">Tutup</button></div>' +
+    '<p class="sub">' + esc(slot) + '</p>' +
+    '<div style="border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:10px">' +
+    '<img src="' + f.dataURL + '" style="width:100%;display:block" alt="">' + '</div>' +
+    '<div class="folder-row" style="margin-bottom:8px"><div class="folder-ico">🕒</div><div><div class="nm">' +
+    esc(fmtWaktuStamp(f.waktu)) + '</div><div class="isi">Stempel waktu (Langkah 1) — terbakar di kiri bawah foto</div></div></div>' +
+    '<div class="folder-row" style="margin-bottom:8px"><div class="folder-ico">' + ICON_GPS + '</div><div><div class="nm">' +
+    (f.lat !== null ? "LAT " + f.lat.toFixed(5) + " · LON " + f.lon.toFixed(5) : "Koordinat belum diambil saat foto diambil") +
+    '</div><div class="isi">Stempel koordinat (Langkah 3) — terbakar di kiri bawah foto</div></div></div>' +
+    '<div class="folder-row" style="margin-bottom:8px"><div class="folder-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.2V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.2"/></svg></div><div><div class="nm">' +
+    (f.lokasi ? esc(f.lokasi) : "LOKASI SAYA belum diambil saat foto diambil") +
+    '</div><div class="isi">Stempel LOKASI SAYA — baris ketiga stempel, tepat di bawah koordinat</div></div></div>' +
+    '<button class="btn-simpan" onclick="unduhSatuFoto(\'' + esc(slot) + '\')">Unduh foto ini (.jpg)</button>';
+}
+
+/* ============================= RENDER ============================= */
+function renderWaktu() {
+  var box = $("waktuBox");
+  if (!st.waktu) {
+    box.innerHTML = '<button class="tap-box" onclick="ambilWaktu()">' +
+      '<span class="ico">🕒</span>Tap untuk mengambil waktu perangkat' +
+      '<small>Jam · Hari · Tanggal · Bulan · Tahun — lokal, tanpa internet</small></button>';
+  } else {
+    var d = st.waktu;
+    box.innerHTML = '<div class="waktu-panel">' +
+      '<div class="hari">' + HARI[d.getDay()] + '</div>' +
+      '<div class="tanggal">' + d.getDate() + " " + BULAN[d.getMonth()] + " " + d.getFullYear() + '</div>' +
+      '<div class="jam">' + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) + '</div>' +
+      '<small>Waktu perangkat (lokal) — tanpa internet</small><br>' +
+      '<button class="btn-mini" onclick="ambilWaktu()">Perbarui Waktu</button></div>';
+  }
+}
+
+function renderCuaca() {
+  var html = "";
+  for (var i = 0; i < CUACA.length; i++) {
+    var c = CUACA[i], on = st.cuaca === c.id;
+    html += '<button class="cuaca' + (on ? " on" : "") + '" onclick="pilihCuaca(\'' + c.id + '\')">' +
+      c.svg + '<span>' + c.label + '</span>' +
+      '<span class="chk">&#10003;</span></button>';
+  }
+  $("cuacaGrid").innerHTML = html;
+  var note = $("cuacaNote");
+  if (st.cuaca) {
+    var label = "";
+    for (var j = 0; j < CUACA.length; j++) if (CUACA[j].id === st.cuaca) label = CUACA[j].label;
+    note.textContent = "Cuaca terpilih: " + label + " ✓";
+    note.className = "cuaca-note on";
+  } else {
+    note.className = "cuaca-note";
+  }
+}
+
+function renderGps() {
+  var box = $("gpsBox");
+  if (st.gps === "idle") {
+    box.innerHTML = '<button class="tap-box" onclick="ambilKoordinat()">📡 Tap untuk mengambil koordinat GPS</button>' + gerbangGpsHtml();
+  } else if (st.gps === "cari") {
+    box.innerHTML = '<div class="gps-cari"><span class="dot"></span>Merata-ratakan ' + st.gpsSampel.length + '/' + TRK_NEED + ' sampel GPS — diam di titik genangan…</div>';
+  } else if (st.gps === "err") {
+    box.innerHTML = '<div class="gps-err">' + esc(st.gpsErr) + '</div>' +
+      '<button class="tap-box" style="margin-top:10px" onclick="ambilKoordinat()">📡 Coba lagi</button>' + gerbangGpsHtml();
+  } else if (st.koordinat) {
+    box.innerHTML = '<div class="gps-hasil">' +
+      '<div class="koor">' + st.koordinat.lat.toFixed(5) + ", " + st.koordinat.lon.toFixed(5) + '</div>' +
+      '<div class="meta"><span>Akurasi ± ' + st.koordinat.akurasi + ' m · rata-rata ' + TRK_NEED + ' sampel</span>' +
+      '<a onclick="ambilKoordinat()">Ambil ulang</a></div></div>';
+  }
+}
+/* Gerbang mutu koordinat 3.1 — prinsip & gaya sama dengan mode titik keliling */
+function gerbangGpsHtml() {
+  return '<div class="trk-opt" style="margin-top:10px"><b>Gerbang mutu — ambang akurasi</b>Koordinat ditolak bila akurasi rata-ratanya lebih buruk dari ±<span id="gpsThV">' + st.gpsTh + '</span> m.<input type="range" min="2" max="15" step="1" value="' + st.gpsTh + '" oninput="setGpsTh(this.value)"></div>';
+}
+function setGpsTh(v) { st.gpsTh = Number(v); var el = $("gpsThV"); if (el) el.textContent = st.gpsTh; }
+
+function renderBlokManual() {
+  var manual = $("blokManual"), otom = $("blokOtomatis");
+  $("btnManual").className = st.metode === "manual" ? "on" : "";
+  $("btnOtomatis").className = st.metode === "otomatis" ? "on" : "";
+
+  if (st.metode === "otomatis") {
+    manual.style.display = "none";
+    manual.innerHTML = ""; // kosongkan blok manual agar tidak ada ID ganda (depthList/hasilStrip)
+    otom.style.display = "block";
+    // 3 metode (Tracking/Titik Koordinat/AI) hanya untuk menghitung LUASAN.
+    // Kedalaman tetap diinput manual — diposisikan di bawah panel metode.
+    var terpilihTxt = st.otomOpsi === "tracking"
+      ? "Metode luasan dipilih: TRACKING — luas poligon otomatis masuk ke panel hasil (Luas & Volume)."
+      : st.otomOpsi === "titik"
+      ? "Metode luasan dipilih: TITIK KOORDINAT — luas poligon otomatis masuk ke panel hasil (Luas & Volume)."
+      : st.otomOpsi === "ai"
+      ? "Metode luasan dipilih: AI — estimasi luas dari analisis foto otomatis masuk ke panel hasil (Luas & Volume)."
+      : "Metode luasan dipilih: " + OPSI_OTOM_LABEL[st.otomOpsi] + ".";
+    otom.innerHTML = '<div class="otomatis-box"><div class="gear">⚙️</div>' +
+      '<b>Mode Otomatis dipilih — pilih metode pengukuran luasan:</b>' +
+      '<div class="opsi-otom">' + OPSI_OTOM.map(opsiOtomKartu).join("") + '</div>' +
+      (st.otomOpsi
+        ? '<div class="opsi-otom-terpilih">' + terpilihTxt + '</div>'
+        : '<div class="opsi-otom-note">Item isian manual disembunyikan. Pilih salah satu metode di atas untuk mulai mengukur luasan genangan.</div>') +
+      '</div>' +
+      (st.otomOpsi === "tracking" ? trkSkeleton() : "") +
+      (st.otomOpsi === "titik" ? tkkSkeleton() : "") +
+      (st.otomOpsi === "ai" ? aiSkeleton() : "") +
+      '<label class="lbl" style="margin-top:14px">Kedalaman (mm) — input manual</label>' +
+      '<div class="depth-list" id="depthList"></div>' +
+      '<button class="tambah" style="margin-top:8px" onclick="tambahKedalaman()">+ Tambahan</button>' +
+      '<div class="hasil" id="hasilStrip"></div>';
+    renderTrack();
+    renderTkk();
+    renderAi();
+    renderKedalaman();
+    renderHasil();
+    return;
+  }
+  manual.style.display = "block";
+  otom.style.display = "none";
+  otom.innerHTML = ""; // kosongkan blok otomatis agar tidak ada ID ganda (depthList/hasilStrip)
+  manual.innerHTML =
+    '<div class="bentuk-sel">' + BENTUK.map(bentukKartu).join("") + '</div>' +
+    '<div class="depth-list">' + manualItemsInner() + '</div>' +
+    '<div class="trk-note" id="manualNote" style="text-align:center;margin-top:8px"></div>' +
+    '<label class="lbl" style="margin-top:14px">Kedalaman (mm)</label>' +
+    '<div class="depth-list" id="depthList"></div>' +
+    '<button class="tambah" style="margin-top:8px" onclick="tambahKedalaman()">+ Tambahan</button>' +
+    '<div class="hasil" id="hasilStrip"></div>';
+  renderKedalaman();
+  renderHasil();
+  renderManualNote();
+}
+
+function renderKedalaman() {
+  var list = $("depthList");
+  if (!list) return;
+  var html = "";
+  for (var i = 0; i < st.kedalaman.length; i++) {
+    var k = st.kedalaman[i];
+    var v = angka(k.nilai);
+    var body;
+    if (k.edit) {
+      body = '<input class="inp" type="text" inputmode="decimal" placeholder="mis. 250 (mm)" value="' + esc(k.nilai) + '"' +
+        ' oninput="setKedalamanNilai(' + k.id + ', this.value)"' +
+        ' onblur="commitKedalaman(' + k.id + ')"' +
+        ' onkeydown="if(event.key===\'Enter\')this.blur()" autofocus>';
+    } else {
+      body = '<div class="depth-val">' + (v !== null ? fmtNum(v, 0) + " mm" : '<span class="muted">belum diisi — tap pensil untuk edit</span>') + '</div>';
+    }
+    html += '<div class="depth-item">' +
+      '<div class="depth-head"><span class="depth-title">Kedalaman ' + (i + 1) + '</span>' +
+      '<span class="depth-tools">' +
+        '<button class="tool tool-edit' + (k.edit ? " idle-cursor" : "") + '" title="Edit angka input" onclick="editKedalaman(' + k.id + ')">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>' +
+        '<button class="tool tool-hapus" title="Hapus item ini" onclick="hapusKedalaman(' + k.id + ')">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+      '</span></div>' + body + '</div>';
+  }
+  list.innerHTML = html;
+  // fokuskan input yang sedang diedit
+  var inputs = list.getElementsByTagName("input");
+  for (var j = 0; j < inputs.length; j++) {
+    if (inputs[j].value === "") { inputs[inputs.length - 1].focus(); break; }
+  }
+}
+
+function renderHasil() {
+  var el = $("hasilStrip");
+  if (!el) return;
+  var lu = luasHitung(), dr = dRata(), vo = volumeHitung();
+  var adaKedalaman = nilaiKedalaman().length >= 1;
+  var grid;
+  if (!adaKedalaman) {
+    // Tanpa data kedalaman: hasil hanya menampilkan LUAS saja.
+    grid = '<div class="hasil-grid satu">' +
+      '<div><div class="k">Luas</div><div class="v">' + (lu !== null ? fmtNum(lu) : "—") + '</div><div class="u">m²</div></div>' +
+      '</div>';
+  } else {
+    grid = '<div class="hasil-grid">' +
+      '<div><div class="k">Luas</div><div class="v">' + (lu !== null ? fmtNum(lu) : "—") + '</div><div class="u">m²</div></div>' +
+      '<div><div class="k">Kedalaman rata²</div><div class="v">' + (dr !== null ? fmtNum(dr / 1000, 3) : "—") + '</div><div class="u">m</div></div>' +
+      '<div><div class="k">Volume</div><div class="v">' + (vo !== null ? fmtNum(vo, 2) : "—") + '</div><div class="u">m³</div></div>' +
+      '</div>';
+  }
+  el.innerHTML = grid +
+    '<small class="tersembunyi">Kedalaman rata-rata &amp; volume terhitung otomatis setiap tambah, edit (pensil), atau hapus (sampah); tanpa kedalaman hasil hanya luas.</small>';
+  el.className = "hasil" + (blinkAktif ? " blink" : "") + (fadeAktif ? " fade" : "");
+}
+
+function renderPills() {
+  var luOk = st.metode === "otomatis"
+    ? ((st.otomOpsi === "tracking" || st.otomOpsi === "titik" || st.otomOpsi === "ai") ? luasHitung() !== null : st.otomOpsi !== "")
+    : luasHitung() !== null;
+  var dOk = nilaiKedalaman().length >= 1; // kedalaman opsional — pill ✓ hanya bila benar-benar diisi
+  $("pillKoor").className = "pill" + (st.koordinat ? " on" : "");
+  $("pillKoor").innerHTML = (st.koordinat ? "✓ " : "") + "Koordinat";
+  $("pillLuas").className = "pill" + (luOk ? " on" : "");
+  $("pillLuas").innerHTML = (luOk ? "✓ " : "") + "Luasan";
+  $("pillDalam").className = "pill" + (dOk ? " on" : "");
+  $("pillDalam").innerHTML = (dOk ? "✓ " : "") + "Kedalaman";
+}
+
+function renderFoto() {
+  var html = "";
+  for (var i = 0; i < FOTO_SLOTS.length; i++) {
+    var s = FOTO_SLOTS[i], f = st.foto[s];
+    if (f) {
+      html += '<div class="slot sudah" data-slot="' + esc(s) + '" onclick="fotoLihat(\'' + esc(s) + '\')">' +
+        '<div class="preview"><img src="' + f.dataURL + '" alt=""></div>' +
+        '<button class="hapus-foto" title="Hapus foto" onclick="hapusFoto(\'' + esc(s) + '\',event)">✕</button>' +
+        '<button class="ambil-lagi" onclick="bukaFoto(\'' + esc(s) + '\',event)">↻ Ambil ulang</button>' +
+        '<div class="ftr"><span class="nama">' + esc(s) + ' ✓</span>' +
+        '<span class="meta-foto">' + esc(fmtWaktuStamp(f.waktu)) + '<br>' +
+        (f.lat !== null ? "LAT " + f.lat.toFixed(5) + " LON " + f.lon.toFixed(5) : "KOORDINAT BELUM DIAMBIL") +
+        (f.lokasi ? '<br>' + esc(f.lokasi) : '') + '</span></div>' +
+        '<div class="load"><span class="dot"></span>Memproses stempel…</div></div>';
+    } else {
+      html += '<div class="slot" data-slot="' + esc(s) + '" onclick="bukaFoto(\'' + esc(s) + '\')">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+        '<span class="nama">' + esc(s) + '</span>' +
+        '<span style="font-size:9.5px;font-weight:600;color:#cbd5e1">Tap untuk ambil foto</span>' +
+        '<div class="load"><span class="dot"></span>Memproses stempel…</div></div>';
+    }
+  }
+  $("fotoGrid").innerHTML = html;
+}
+
+function renderProg() {
+  var L = [langkah1(), langkah2(), langkah3(), langkah4()];
+  var n = 0, belum = [];
+  for (var i = 0; i < 4; i++) {
+    $("seg" + (i + 1)).className = L[i] ? "on" : "";
+    if (L[i]) n++; else if (i < 3) belum.push("Langkah " + (i + 1)); // foto opsional → Langkah 4 tak pernah disebut sebagai menunggu
+  }
+  $("progTxt").textContent = n + "/4";
+  $("card1").className = "card" + (L[0] ? " done" : "");
+  $("card2").className = "card" + (L[1] ? " done" : "");
+  $("card3").className = "card" + (L[2] ? " done" : "");
+  $("card4").className = "card" + (L[3] ? " done" : "");
+  $("exportStatus").textContent = n + "/4 langkah selesai" + (belum.length ? " · menunggu: " + belum.join(", ") : "");
+}
+
+function renderAll() {
+  renderWaktu(); renderCuaca(); renderGps(); renderLokasi();
+  renderBlokManual(); renderPills(); renderFoto(); renderProg();
+}
+
+/* ============================= EXPORT ============================= */
+function buatJson() {
+  var d = st.waktu;
+  return {
+    aplikasi: "Form Survei Genangan (HTML)",
+    versi: "1.2", // 1.2: koordinat 3.1 rata-rata 10 sampel + gerbang mutu, LOKASI SAYA otomatis, simulasi GPS dihapus total (data hanya GPS asli)
+    waktu_survei: d ? HARI[d.getDay()] + ", " + d.getDate() + " " + BULAN[d.getMonth()] + " " + d.getFullYear() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) : null,
+    cuaca: st.cuaca,
+    koordinat: st.koordinat,
+    lokasi_saya: st.lokasi ? st.lokasi.teks : null, // alamat berjenjang dari panel LOKASI SAYA (reverse geocoding OSM)
+    metode_luas: st.metode === "manual" ? "manual" : "otomatis/" + (st.otomOpsi || "belum dipilih"),
+    panjang_mm: st.metode === "manual" && st.bentuk === 1 ? angka(st.panjang) : null, // hanya terekam di mode manual bentuk persegi panjang
+    lebar_mm: st.metode === "manual" && st.bentuk === 1 ? angka(st.lebar) : null,
+    manual_bentuk_pilihan: st.metode === "manual" ? st.bentuk : null, // 1=2 polyline (persegi panjang) … 5=6 polyline (segi enam)
+    manual_sisi_mm: st.metode === "manual" ? (function () {
+      var a = [];
+      if (st.bentuk === 1) a.push(angka(st.panjang), angka(st.lebar));
+      else for (var i = 0; i < st.bentuk + 1; i++) a.push(angka(st.sisi[i]));
+      return a;
+    })() : null,
+    luas_m2: luasHitung(),
+    kedalaman_item: st.kedalaman.length,
+    kedalaman_nilai_mm: nilaiKedalaman(),
+    kedalaman_rata_mm: dRata(),
+    volume_m3: volumeHitung(),
+    track_ringkasan: st.metode === "otomatis" && st.otomOpsi === "tracking" && st.track.vertices.length >= 3 ? {
+      jumlah_titik_sudut: st.track.vertices.length,
+      keliling_m: Number(trkPerim(st.track.vertices).toFixed(2)),
+      akurasi_rata_m: Number((st.track.vertices.reduce(function (s, v) { return s + v.acc; }, 0) / st.track.vertices.length).toFixed(2))
+    } : null, // hanya ringkasan angka; koordinat titik sudut direkam lengkap di batas_genangan
+    titik_ringkasan: st.metode === "otomatis" && st.otomOpsi === "titik" && tkkVertices().length >= 3 ? {
+      cara_input: st.tkk.mode,
+      jumlah_titik: tkkVertices().length,
+      keliling_m: Number(trkPerim(tkkXY(tkkVertices())).toFixed(2)),
+      akurasi_rata_m: st.tkk.mode === "gps" ? Number((tkkVertices().reduce(function (s, v) { return s + (v.acc || 0); }, 0) / tkkVertices().length).toFixed(2)) : null
+    } : null, // hanya ringkasan angka; koordinat titik sudut direkam lengkap di batas_genangan
+    batas_genangan: (function () {
+      /* POLIGON BATAS GENANGAN — dibaca skrip QGIS untuk folder 04 (KML/KMZ)
+         & 05 (QGZ/GPKG). Array titik sudut BERURUT (searah pengambilan);
+         penutupan cincin (titik pertama diulang di akhir) dilakukan skrip QGIS.
+         Mode manual: tanpa geometri nyata — poligon ilustratif direkonstruksi
+         skrip QGIS dari koordinat + manual_bentuk_pilihan + manual_sisi_mm.
+         Mode AI: tanpa poligon (luas diperkirakan dari foto — hanya angka). */
+      if (st.metode === "otomatis" && st.otomOpsi === "tracking" && st.track.vertices.length >= 3) {
+        return { via: "tracking", titik_sudut: st.track.vertices.map(function (v) {
+          return { lat: Number(v.lat.toFixed(6)), lng: Number(v.lng.toFixed(6)), akurasi_m: v.acc };
+        }) };
+      }
+      if (st.metode === "otomatis" && st.otomOpsi === "titik" && tkkVertices().length >= 3) {
+        return { via: "titik_keliling", titik_sudut: tkkVertices().map(function (v) {
+          return { lat: Number(v.lat.toFixed(6)), lng: Number(v.lon.toFixed(6)), akurasi_m: (v.acc !== undefined ? v.acc : null) };
+        }) };
+      }
+      return null;
+    })(),
+    ai_ringkasan: st.metode === "otomatis" && st.otomOpsi === "ai" && st.ai.hasil ? {
+      jumlah_foto: st.ai.fotos.length,
+      mistar_mm: st.ai.rodMm,
+      resolusi_kerja_px: st.ai.res,
+      luas_m2: st.ai.hasil.luas,
+      ketidakpastian_persen: st.ai.hasil.unc,
+      status_kualitas: st.ai.hasil.status,
+      folder_foto_ai: "AI_FOTO_ANALISA (penyimpanan tersendiri — DI LUAR output 01–05)"
+    } : null, // foto analisa AI disimpan di folder terpisah; JSON hanya merekam ringkasan angka
+    foto_bukti: (function () {
+      var f = [];
+      for (var i = 0; i < FOTO_SLOTS.length; i++) {
+        var s = FOTO_SLOTS[i], fo = st.foto[s];
+        if (fo) f.push({
+          jenis: s,
+          nama_file: fo.file,
+          waktu_stempel: fmtWaktuStamp(fo.waktu),
+          waktu_iso: new Date(fo.waktu.getTime()).toISOString(),
+          latitude: fo.lat, longitude: fo.lon,
+          lokasi: fo.lokasi || null,
+          stempel_terbakar: "hari, tanggal, bulan, tahun, jam (Langkah 1) + koordinat (Langkah 3) + LOKASI SAYA (bila diambil) pada kiri bawah foto"
+        });
+      }
+      return f;
+    })(),
+    folder_output: ["01_DATA_SURVEI", "02_FOTO_BUKTI", "03_OUTPUT_EXCEL_CSV", "04_OUTPUT_KML_KMZ", "05_OUTPUT_QGZ_GPKG"],
+    lokasi_simpan: folderHandle ? folderHandle.name + " (folder perangkat, dipilih pengguna)" : "Folder Unduhan perangkat — arsip SURVEI_GENANGAN_*.zip"
+  };
+}
+
+/* Unduh foto bukti ber-stempel (folder 02_FOTO_BUKTI) */
+function unduhDataUrl(dataURL, nama) {
+  try {
+    var a = document.createElement("a");
+    a.href = dataURL;
+    a.download = nama.split("/").pop();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (e) {}
+}
+function unduhSatuFoto(slot) {
+  var f = st.foto[slot];
+  if (f) unduhDataUrl(f.dataURL, f.file);
+}
+/* Tombol "Unduh Salinan Foto" di layar sukses jalur folder asli DIHAPUS:
+   foto sudah ditulis nyata ke subfolder 02_FOTO_BUKTI saat simpan —
+   salinan unduhan hanya duplikat dan berisiko diblokir browser (multi-download).
+   unduhSatuFoto tetap dipakai modal "Lihat Foto" (unduh satu foto kapan pun). */
+
+function bukaExport() {
+  eksStatus = "idle"; prog = 0;
+  if (timerSimpan) { clearInterval(timerSimpan); timerSimpan = null; }
+  $("ovl").className = "overlay on";
+  renderExport();
+}
+function tutupExport() { $("ovl").className = "overlay"; }
+
+/* ===== PENYIMPANAN NYATA =====
+   Browser modern (Chrome/Edge desktop) mendukung File System Access API:
+   pengguna MEMILIH folder sungguhan → subfolder 01_DATA_SURVEI & 02_FOTO_BUKTI
+   beserta isinya benar-benar dibuat dan ditulis ke penyimpanan perangkat.
+   Browser tanpa dukungan itu (Chrome Android, Safari, Firefox) tidak bisa
+   memilih folder — karena itu hasil disatukan otomatis menjadi SATU ARSIP
+   .zip (berisi struktur folder 01–02) yang terunduh ke folder Unduhan. */
+function lokasiTeks() {
+  if (folderHandle) return folderHandle.name + "/";
+  if (window.showDirectoryPicker) return "Belum dipilih — tap tombol di bawah";
+  return "Unduhan perangkat — disimpan sebagai satu arsip .zip";
+}
+function setProg(p) { prog = p; var bar = $("pbarFill"); if (bar) bar.style.width = p + "%"; }
+
+async function pilihFolder() {
+  if (!window.showDirectoryPicker) return false; // browser tak mendukung: mode ZIP otomatis
+  try {
+    folderHandle = await window.showDirectoryPicker({ id: "survei-genangan", mode: "readwrite", startIn: "documents" });
+    renderExport();
+    return true;
+  } catch (e) { return false; /* pengguna membatalkan dialog folder */ }
+}
+
+function dataURLtoBytes(u) {
+  var b64 = u.split(",")[1], bin = atob(b64), out = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+/* ZIP (store/tanpa kompresi) dibangun manual — tanpa pustaka eksternal */
+function crc32(buf) {
+  if (!crc32.t) { crc32.t = []; for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); crc32.t[n] = c >>> 0; } }
+  var c = 0xFFFFFFFF;
+  for (var i = 0; i < buf.length; i++) c = crc32.t[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+/* Nama file JSON UNIK per survei (stempel tanggal-jam, sumber waktu sama dengan
+   nama arsip .zip) — banyak titik genangan yang diexport ke folder yang sama
+   menghasilkan banyak file yang BERBEDA (tidak saling menimpa); urutan nomor
+   record 1,2,3... di tabel Excel kemudian disusun dari stempel waktu ini. */
+var namaJsonTerakhir = "data_form_genangan.json";
+function namaJsonFile() {
+  var d = st.waktu || new Date();
+  return "data_form_genangan_" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes()) + ".json";
+}
+
+function unduhZip() {
+  var enc = new TextEncoder();
+  namaJsonTerakhir = namaJsonFile();
+  var files = [{ nama: "01_DATA_SURVEI/" + namaJsonTerakhir, data: enc.encode(JSON.stringify(buatJson(), null, 2)) }];
+  for (var i = 0; i < FOTO_SLOTS.length; i++) {
+    var f = st.foto[FOTO_SLOTS[i]];
+    if (f) files.push({ nama: f.file, data: dataURLtoBytes(f.dataURL) });
+  }
+  var chunks = [], central = [], offset = 0;
+  for (var j = 0; j < files.length; j++) {
+    var nama = files[j].nama, data = files[j].data;
+    var nb = enc.encode(nama), crc = crc32(data);
+    var lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true);
+    lh.setUint16(10, 0, true); lh.setUint16(12, 0x21, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true);
+    lh.setUint16(26, nb.length, true);
+    chunks.push(new Uint8Array(lh.buffer), nb, data);
+    var ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(12, 0, true); ch.setUint16(14, 0x21, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true);
+    ch.setUint16(28, nb.length, true); ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), nb);
+    offset += 30 + nb.length + data.length;
+  }
+  var cdSize = 0; for (var c = 0; c < central.length; c++) cdSize += central[c].length;
+  var eocd = new DataView(new ArrayBuffer(22));
+  eocd.setUint32(0, 0x06054b50, true); eocd.setUint16(8, files.length, true); eocd.setUint16(10, files.length, true);
+  eocd.setUint32(12, cdSize, true); eocd.setUint32(16, offset, true);
+  var blob = new Blob(chunks.concat(central, [new Uint8Array(eocd.buffer)]), { type: "application/zip" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  var d = st.waktu || new Date();
+  a.download = "SURVEI_GENANGAN_" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes()) + ".zip";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+async function simpanKeFolder() {
+  eksStatus = "proses"; prog = 0; renderExport();
+  try {
+    var dirData = await folderHandle.getDirectoryHandle("01_DATA_SURVEI", { create: true });
+    namaJsonTerakhir = namaJsonFile();
+    var fh = await dirData.getFileHandle(namaJsonTerakhir, { create: true });
+    var w = await fh.createWritable();
+    await w.write(JSON.stringify(buatJson(), null, 2));
+    await w.close();
+    setProg(35);
+    var dirFoto = await folderHandle.getDirectoryHandle("02_FOTO_BUKTI", { create: true });
+    for (var i = 0; i < FOTO_SLOTS.length; i++) {
+      var f = st.foto[FOTO_SLOTS[i]];
+      if (f) {
+        var fh2 = await dirFoto.getFileHandle(f.file.split("/").pop(), { create: true });
+        var w2 = await fh2.createWritable();
+        await w2.write(dataURLtoBytes(f.dataURL));
+        await w2.close();
+      }
+      setProg(35 + Math.round(60 * (i + 1) / FOTO_SLOTS.length));
+    }
+    setProg(100);
+    eksStatus = "sukses";
+    renderExport();
+  } catch (e) {
+    eksStatus = "idle"; prog = 0; renderExport();
+    alert("Gagal menulis ke folder perangkat: " + (e && e.message ? e.message : e) + "\nCoba pilih folder lain, atau pakai mode arsip .zip (Unduhan).");
+  }
+}
+
+async function mulaiSimpan() {
+  /* ALUR WAJIB: pilih folder tujuan DULU, baru simpan.
+     Bila browser mendukung pemilihan folder dan belum ada folder terpilih,
+     dialog pemilih folder dibuka lebih dulu; bila dibatalkan, penyimpanan dihentikan. */
+  if (window.showDirectoryPicker && !folderHandle) {
+    var ok = await pilihFolder();
+    if (!ok) return; // batal pilih folder → jangan simpan
+  }
+  if (folderHandle) { simpanKeFolder(); return; } // folder asli dipilih → tulis langsung
+  /* Fallback: browser tanpa File System Access API (Chrome Android/Safari/Firefox)
+     tidak bisa memilih folder sama sekali → satu arsip .zip ke folder Unduhan. */
+  eksStatus = "proses"; prog = 0; renderExport();
+  timerSimpan = setInterval(function () {
+    prog = Math.min(prog + 4, 100);
+    var bar = $("pbarFill");
+    if (bar) bar.style.width = prog + "%";
+    if (prog >= 100) {
+      clearInterval(timerSimpan); timerSimpan = null;
+      eksStatus = "sukses";
+      unduhZip();
+      renderExport();
+    }
+  }, 60);
+}
+
+function renderExport() {
+  var sheet = $("sheet");
+  var L = [langkah1(), langkah2(), langkah3(), langkah4()];
+  var belum = [];
+  for (var i = 0; i < 3; i++) if (!L[i]) belum.push("Langkah " + (i + 1)); // foto opsional → hanya Langkah 1–3 yang bisa "belum"
+
+  if (eksStatus === "sukses") {
+    var rows = "";
+    for (var f = 0; f < FOLDERS.length; f++) {
+      rows += '<div><i>✓</i><b>' + FOLDERS[f].nama + '/</b></div>';
+    }
+    sheet.innerHTML = '<div class="sukses">' +
+      '<div class="ok-circle">✓</div>' +
+      '<h2>' + (folderHandle ? "Berhasil — Data Ditulis ke Folder Perangkat" : "Berhasil — Arsip .zip Terunduh") + '</h2>' +
+      '<div class="path">' + esc(lokasiTeks()) + '</div>' +
+      '<div class="ok-list">' + rows + '</div>' +
+      (folderHandle
+        ? '<div class="unduh-note">💡 File <b>' + esc(namaJsonTerakhir) + '</b> dan <b>foto JPG ber-stempel yang diambil</b> benar-benar dibuat di dalam folder pilihan Anda (subfolder 01_DATA_SURVEI &amp; 02_FOTO_BUKTI). Nama file JSON ber-stempel tanggal-jam — tiap survei/titik = file tersendiri, tidak saling menimpa. Folder 03–05 disimulasikan (file aslinya dibangun aplikasi kantor/QGIS di tahap berikutnya).</div>'
+        : '<div class="unduh-note">💡 Browser ini tidak mendukung pemilihan folder, jadi hasil disatukan menjadi <b>SURVEI_GENANGAN_*.zip</b> di folder Unduhan — di dalamnya sudah berstruktur: <b>01_DATA_SURVEI/' + esc(namaJsonTerakhir) + '</b> &amp; <b>02_FOTO_BUKTI/foto ber-stempel</b>. Folder 03–05 disimulasikan.</div>') +
+      (folderHandle
+        ? "" /* foto & data sudah tersimpan nyata di folder pilihan — tanpa tombol salinan */
+        : '<button class="btn-simpan" style="margin-top:12px" onclick="unduhZip()">🗜️ Unduh Ulang Arsip .zip</button>') +
+      '<p style="margin-top:12px;font-size:11px;color:#94a3b8">Sepenuhnya lokal di perangkat Anda — tanpa internet.</p>' +
+      '<button class="btn-selesai" onclick="tutupExport()">Selesai</button>' +
+      '</div>';
+    return;
+  }
+
+  var folderRows = "";
+  for (var k = 0; k < FOLDERS.length; k++) {
+    folderRows += '<div class="folder-row">' +
+      '<span class="folder-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>' +
+      '<span style="min-width:0"><span class="nm">' + FOLDERS[k].nama + '/</span><br><span class="isi">' + FOLDERS[k].isi + " — " + FOLDERS[k].ket + '</span></span>' +
+      '</div>';
+  }
+
+  var aksi;
+  if (eksStatus === "proses") {
+    aksi = '<div class="pbar-wrap"><div class="pbar-txt"><span class="dot"></span>Menulis data &amp; foto bukti…</div>' +
+           '<div class="pbar"><i id="pbarFill" style="width:' + prog + '%"></i></div></div>';
+  } else {
+    aksi = '<button class="btn-simpan" onclick="mulaiSimpan()">' + (folderHandle ? "💾 Simpan ke Folder: " + esc(folderHandle.name) : (window.showDirectoryPicker ? "📂 Pilih Folder &amp; Simpan" : "💾 Simpan sebagai Arsip .zip ke Unduhan")) + '</button>';
+  }
+
+  sheet.innerHTML =
+    '<div class="sheet-head"><h2>Export Data — 5 Folder</h2>' +
+    '<button class="btn-tutup" onclick="tutupExport()">Tutup</button></div>' +
+    '<p class="sub">Semua hasil survei disimpan ke penyimpanan lokal perangkat — tanpa internet.</p>' +
+    (belum.length ? '<div class="warn">⚠️ Belum selesai: ' + belum.join(", ") + '. Data yang belum lengkap tetap ikut diekspor.</div>' : "") +
+    '<div class="folder-list">' + folderRows + '</div>' +
+    '<div class="lokasi-box"><div class="k">Folder tujuan penyimpanan</div>' +
+    '<div class="path">' + esc(lokasiTeks()) + '</div>' +
+    (window.showDirectoryPicker
+      ? '<div class="trk-note" style="text-align:left;margin-top:8px">📌 Alur: tap <b>Pilih Folder &amp; Simpan</b> → dialog pemilih folder terbuka → pilih/membuat folder tujuan → file otomatis ditulis ke dalamnya.</div>' +
+        '<button class="btn-lokasi" onclick="pilihFolder()">' + (folderHandle ? "📂 Ganti Folder Pilihan" : "📂 Pilih Folder di Perangkat") + '</button>'
+      : '<div class="trk-note" style="text-align:left;margin-top:8px">ℹ️ Browser ini tidak dapat membuka pemilih folder (batasan Chrome Android/Safari/Firefox). Hasil otomatis disatukan menjadi <b>satu arsip .zip</b> di folder Unduhan — struktur folder tetap terjaga di dalam arsip.</div>') +
+    '</div>' +
+    aksi;
+}
+
+/* overlay: tap area gelap untuk menutup */
+$("ovl").addEventListener("click", function (e) { if (e.target === this) tutupExport(); });
+
+/* ============================= INIT ============================= */
+renderAll();
+</script>
+</body>
+</html>
